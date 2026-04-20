@@ -1,5 +1,9 @@
 package com.metodologia.bodyPaint.feature.repositories;
 
-public interface ClienteRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.metodologia.bodyPaint.feature.models.Cliente;
+
+public interface ClienteRepository extends JpaRepository<Cliente, Long>{
 
 }
