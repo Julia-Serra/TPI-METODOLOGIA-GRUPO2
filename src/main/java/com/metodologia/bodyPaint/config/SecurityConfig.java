@@ -1,4 +1,4 @@
-package com.programacion4.unidad3ej4.config;
+package com.metodologia.bodyPaint.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

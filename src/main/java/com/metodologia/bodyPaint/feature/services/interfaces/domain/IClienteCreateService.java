@@ -1,7 +1,6 @@
 package com.metodologia.bodyPaint.feature.services.interfaces.domain;
-
-import com.metodologia.bodyPaint.feature.dtos.request.ClienteRequest;
+import com.metodologia.bodyPaint.feature.models.Cliente;
 
 public interface IClienteCreateService {
-    void Crear(ClienteRequest request);
+    void crear(Cliente cliente);
 }
