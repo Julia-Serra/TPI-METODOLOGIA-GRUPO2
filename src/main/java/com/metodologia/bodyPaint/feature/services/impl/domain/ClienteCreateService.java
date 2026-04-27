@@ -19,7 +19,11 @@ public class ClienteCreateService implements IClienteCreateService {
     @Override
     @Transactional
     public void crear(Cliente cliente) {
+        if (clienteRepository.existsByEmail(cliente.getEmail())) {
+            throw new RuntimeException("El email ya está registrado");
+        }
         clienteRepository.save(cliente);
+
     }
 
 
