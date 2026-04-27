@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.metodologia.bodyPaint.config.exceptions.BadRequestException;
 import com.metodologia.bodyPaint.feature.models.Cliente;
+import com.metodologia.bodyPaint.feature.models.Rol;
 import com.metodologia.bodyPaint.feature.repositories.ClienteRepository;
 import com.metodologia.bodyPaint.feature.services.interfaces.domain.IClienteCreateService;
 
@@ -23,6 +24,7 @@ public class ClienteCreateService implements IClienteCreateService {
         if (clienteRepository.existsByEmail(cliente.getEmail())) {
             throw new BadRequestException("El email ya está registrado");
         }
+        cliente.setRol(Rol.ROLE_CLIENTE);
         clienteRepository.save(cliente);
 
     }
