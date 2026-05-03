@@ -10,7 +10,6 @@ import com.metodologia.bodyPaint.feature.repositories.ClienteRepository;
 
 import lombok.RequiredArgsConstructor;
 
-/*User admin creado automaticamente*/
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
@@ -21,17 +20,27 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        if (!clienteRepository.existsByEmail("admin@mail.com")) {
+        if (clienteRepository.count() == 0) {
 
-            Cliente admin = Cliente.builder()
+            clienteRepository.save(
+                Cliente.builder()
                     .nombre("Admin")
-                    .email("admin@mail.com")
-                    .username("admin")
+                    .apellido("Principal")
+                    .email("admin@bodypaint.com")
                     .password(passwordEncoder.encode("1234"))
                     .rol(Rol.ROLE_ADMIN)
-                    .build();
+                    .build()
+            );
 
-            clienteRepository.save(admin);
+            clienteRepository.save(
+                Cliente.builder()
+                    .nombre("Cliente")
+                    .apellido("Demo")
+                    .email("cliente@bodypaint.com")
+                    .password(passwordEncoder.encode("1234"))
+                    .rol(Rol.ROLE_CLIENTE)
+                    .build()
+            );
         }
     }
 }
