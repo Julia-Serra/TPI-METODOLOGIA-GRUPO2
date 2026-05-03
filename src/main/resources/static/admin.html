@@ -1,26 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Admin - Productos</title>
+    <style>
+        body { font-family: Arial; background:#f4f6f8; }
+        .container { width:400px; margin:50px auto; background:white; padding:20px; border-radius:10px; }
+        input, button { width:100%; padding:10px; margin:5px 0; }
+        button { background:#6c63ff; color:white; border:none; }
+        #msg { margin-top:10px; font-weight:bold; }
+    </style>
 </head>
-
 <body>
-    <h2>Productos</h2>
-    <ul id="lista"></ul>
 
-    <script>
-        fetch("http://localhost:8080/productos")
-            .then(r => r.json())
-            .then(productos => {
-                const ul = document.getElementById("lista");
-                productos.forEach(p => {
-                    ul.innerHTML += `<li>${p.nombre} - $${p.precio}</li>`;
-                });
+<div class="container">
+    <h2>Crear Producto</h2>
+
+    <form id="formProducto">
+        <input id="nombre" placeholder="Nombre" required>
+        <input id="marca" placeholder="Marca" required>
+        <input id="precio" type="number" placeholder="Precio" required>
+        <input id="stock" type="number" placeholder="Stock" required>
+
+        <button type="submit">Crear</button>
+    </form>
+
+    <p id="msg"></p>
+</div>
+
+<script>
+    document.getElementById("formProducto").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const msg = document.getElementById("msg");
+
+        const producto = {
+            nombre: nombre.value,
+            marca: marca.value,
+            precio: parseFloat(precio.value),
+            stock: parseInt(stock.value)
+        };
+
+        try {
+            const res = await fetch("http://localhost:8080/productos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic " + btoa("admin@bodypaint.com:1234")
+                },
+                body: JSON.stringify(producto)
             });
-    </script>
-</body>
 
+            const data = await res.json();
+
+            if (!res.ok) {
+                msg.innerText = "❌ " + (data.errors ? data.errors.join(", ") : data.message);
+                return;
+            }
+
+            msg.innerText = "✅ Producto creado correctamente";
+            formProducto.reset();
+
+        } catch (err) {
+            msg.innerText = "❌ Error de conexión con el servidor";
+        }
+    });
+</script>
+
+</body>
 </html>

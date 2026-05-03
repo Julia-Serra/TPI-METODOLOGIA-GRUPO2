@@ -23,25 +23,27 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
 
-                        // HTML públicos
+                        //
                         .requestMatchers(
                                 "/",
                                 "/index.html",
                                 "/registro.html",
-                                "/producto.html")
-                        .permitAll()
+                                "/admin.html",
+                                "/producto.html",
+                                "/**/*.css",
+                                "/**/*.js"
+                        ).permitAll()
 
-                        // GET productos público
-                        .requestMatchers(HttpMethod.GET, "/productos").permitAll()
-
-                        // POST producto solo ADMIN
-                        .requestMatchers(HttpMethod.POST, "/productos").hasRole("ADMIN")
-
-                        // POST cliente público (registro)
+                        // API PÚBLICA
+                        .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
 
-                        // lo demás autenticado
-                        .anyRequest().authenticated())
+                        // SOLO ADMIN
+                        .requestMatchers(HttpMethod.POST, "/productos").hasRole("ADMIN")
+
+                        // RESTO PROTEGIDO
+                        .anyRequest().authenticated()
+                )
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
@@ -61,7 +63,7 @@ public class SecurityConfig {
             return org.springframework.security.core.userdetails.User
                     .withUsername(cliente.getEmail())
                     .password(cliente.getPassword())
-                    .authorities(cliente.getRol().name()) 
+                    .authorities(cliente.getRol().name())
                     .build();
         };
     }
