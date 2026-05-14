@@ -1,6 +1,5 @@
 package com.metodologia.bodyPaint.feature.models;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
