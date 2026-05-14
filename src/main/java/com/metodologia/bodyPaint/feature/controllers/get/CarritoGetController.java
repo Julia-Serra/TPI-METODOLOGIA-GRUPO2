@@ -1,5 +1,6 @@
 package com.metodologia.bodyPaint.feature.controllers.get;
 
+import com.metodologia.bodyPaint.config.exceptions.BadRequestException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,9 @@ public class CarritoGetController {
     @GetMapping("/{id}")
     public BaseResponse<Carrito> obtener(@PathVariable Long id) {
 
-        Carrito carrito = carritoRepository.findById(id).orElseThrow();
+        Carrito carrito = carritoRepository.findById(id)
+                .orElseThrow(() ->
+                        new BadRequestException("Carrito no encontrado"));
 
         return BaseResponse.ok(carrito, "Carrito encontrado");
     }

@@ -18,7 +18,10 @@ public class Carrito {
     @GeneratedValue
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<ItemCarrito> items = new ArrayList<>();
 
     public double getTotal() {

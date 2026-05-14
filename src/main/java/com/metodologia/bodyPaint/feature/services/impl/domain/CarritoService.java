@@ -1,5 +1,6 @@
 package com.metodologia.bodyPaint.feature.services.impl.domain;
 
+import com.metodologia.bodyPaint.config.exceptions.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import com.metodologia.bodyPaint.feature.models.Carrito;
@@ -22,6 +23,11 @@ public class CarritoService {
     }
 
     public Carrito agregarProducto(Long carritoId, Long productoId, int cantidad) {
+        if(cantidad <= 0) {
+            throw new BadRequestException(
+                    "La cantidad debe ser mayor a 0"
+            );
+        }
 
         Carrito carrito = carritoRepository.findById(carritoId).orElseThrow();
 
@@ -65,7 +71,9 @@ public class CarritoService {
 
     public Carrito vaciar(Long carritoId) {
 
-        Carrito carrito = carritoRepository.findById(carritoId).orElseThrow();
+        Carrito carrito = carritoRepository.findById(carritoId)
+                .orElseThrow(() ->
+                        new BadRequestException("Carrito no encontrado"));
 
         carrito.getItems().clear();
 
@@ -77,16 +85,25 @@ public class CarritoService {
             int cantidad
     ) {
 
-        Carrito carrito = carritoRepository.findById(carritoId).orElseThrow();
+        if(cantidad <= 0) {
+            throw new BadRequestException(
+                    "La cantidad debe ser mayor a 0"
+            );
+        }
+
+        Carrito carrito = carritoRepository.findById(carritoId)
+                .orElseThrow(() ->
+                        new BadRequestException("Carrito no encontrado"));
 
         ItemCarrito item = carrito.getItems()
                 .stream()
                 .filter(i -> i.getProducto().getId().equals(productoId))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() ->
+                        new BadRequestException("Producto no encontrado en carrito"));
 
         if(item.getProducto().getStock() < cantidad) {
-            throw new RuntimeException("Stock insuficiente");
+            throw new BadRequestException("Stock insuficiente");
         }
 
         item.setCantidad(cantidad);
@@ -95,11 +112,19 @@ public class CarritoService {
     }
     public Carrito quitarProducto(Long carritoId, Long productoId) {
 
-        Carrito carrito = carritoRepository.findById(carritoId).orElseThrow();
+        Carrito carrito = carritoRepository.findById(carritoId)
+                .orElseThrow(() ->
+                        new BadRequestException("Carrito no encontrado"));
 
-        carrito.getItems().removeIf(
+        boolean eliminado = carrito.getItems().removeIf(
                 i -> i.getProducto().getId().equals(productoId)
         );
+
+        if(!eliminado) {
+            throw new BadRequestException(
+                    "Producto no encontrado en carrito"
+            );
+        }
 
         return carritoRepository.save(carrito);
     }
