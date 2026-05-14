@@ -1,71 +1,137 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Admin - Productos</title>
     <style>
-        body { font-family: Arial; background:#f4f6f8; }
-        .container { width:400px; margin:50px auto; background:white; padding:20px; border-radius:10px; }
-        input, button { width:100%; padding:10px; margin:5px 0; }
-        button { background:#6c63ff; color:white; border:none; }
-        #msg { margin-top:10px; font-weight:bold; }
+        body {
+            font-family: Arial;
+            background: #f4f6f8;
+        }
+
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+
+        button {
+            background: #6c63ff;
+            color: white;
+            border: none;
+        }
+
+        #msg {
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h2>Crear Producto</h2>
+    <div class="container">
+        <h2>Crear Producto</h2>
 
-    <form id="formProducto">
-        <input id="nombre" placeholder="Nombre" required>
-        <input id="marca" placeholder="Marca" required>
-        <input id="precio" type="number" placeholder="Precio" required>
-        <input id="stock" type="number" placeholder="Stock" required>
+        <form id="formProducto">
+            <input id="nombre" placeholder="Nombre" required>
+            <input id="marca" placeholder="Marca" required>
+            <input id="precio" type="number" placeholder="Precio" required>
+            <input id="stock" type="number" placeholder="Stock" required>
 
-        <button type="submit">Crear</button>
-    </form>
+            <button type="submit">Crear</button>
+        </form>
 
-    <p id="msg"></p>
-</div>
+        <p id="msg"></p>
+        <hr>
 
-<script>
-    document.getElementById("formProducto").addEventListener("submit", async e => {
-        e.preventDefault();
+        <h2>Cancelar entrega de pedido</h2>
 
-        const msg = document.getElementById("msg");
+        <input id="pedidoId" type="number" placeholder="ID del pedido">
+        <input id="motivo" placeholder="Motivo de cancelación">
 
-        const producto = {
-            nombre: nombre.value,
-            marca: marca.value,
-            precio: parseFloat(precio.value),
-            stock: parseInt(stock.value)
-        };
+        <button onclick="cancelarPedido()">Cancelar pedido</button>
 
-        try {
-            const res = await fetch("http://localhost:8080/productos", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic " + btoa("admin@bodypaint.com:1234")
-                },
-                body: JSON.stringify(producto)
-            });
+        <p id="msgCancelacion"></p>
+    </div>
 
-            const data = await res.json();
+    <script>
+        document.getElementById("formProducto").addEventListener("submit", async e => {
+            e.preventDefault();
 
-            if (!res.ok) {
-                msg.innerText = "❌ " + (data.errors ? data.errors.join(", ") : data.message);
-                return;
+            const msg = document.getElementById("msg");
+
+            const producto = {
+                nombre: nombre.value,
+                marca: marca.value,
+                precio: parseFloat(precio.value),
+                stock: parseInt(stock.value)
+            };
+
+            try {
+                const res = await fetch("http://localhost:8080/productos", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic " + btoa("admin@bodypaint.com:1234")
+                    },
+                    body: JSON.stringify(producto)
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    msg.innerText = "❌ " + (data.errors ? data.errors.join(", ") : data.message);
+                    return;
+                }
+
+                msg.innerText = "✅ Producto creado correctamente";
+                formProducto.reset();
+
+            } catch (err) {
+                msg.innerText = "❌ Error de conexión con el servidor";
             }
+        });
+        async function cancelarPedido() {
+            const id = document.getElementById("pedidoId").value;
+            const motivo = document.getElementById("motivo").value;
+            const msg = document.getElementById("msgCancelacion");
 
-            msg.innerText = "✅ Producto creado correctamente";
-            formProducto.reset();
+            try {
+                const res = await fetch(`http://localhost:8080/pedidos/${id}/cancelar`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic " + btoa("admin@bodypaint.com:1234")
+                    },
+                    body: JSON.stringify({ motivo: motivo })
+                });
 
-        } catch (err) {
-            msg.innerText = "❌ Error de conexión con el servidor";
+                const text = await res.text();
+
+                if (!res.ok) {
+                    msg.innerText = "❌ " + text;
+                    return;
+                }
+
+                msg.innerText = "✅ Pedido cancelado correctamente";
+
+            } catch (err) {
+                msg.innerText = "❌ Error de conexión con el servidor";
+            }
         }
-    });
-</script>
+    </script>
 
 </body>
+
 </html>

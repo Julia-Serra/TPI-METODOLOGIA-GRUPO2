@@ -1,12 +1,11 @@
 package com.metodologia.bodyPaint.feature.models;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Cliente {
 
     @Id
@@ -35,6 +35,6 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @Embedded
     private Direccion direccion;
 }

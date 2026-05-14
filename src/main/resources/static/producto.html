@@ -7,6 +7,7 @@
         body { font-family: Arial; background:#f4f6f8; }
         .container { width:400px; margin:50px auto; background:white; padding:20px; border-radius:10px; }
         li { margin:5px 0; padding:10px; background:#eee; }
+        img { width: 100px; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -17,20 +18,60 @@
 </div>
 
 <script>
-    fetch("http://localhost:8080/productos")
-    .then(res => res.json())
-    .then(data => {
-        const ul = document.getElementById("lista");
+fetch("http://localhost:8080/productos")
+.then(res => res.json())
+.then(data => {
+    const ul = document.getElementById("lista");
 
-        data.data.forEach(p => {
-            ul.innerHTML += `<li>
+    data.data.forEach(p => {
+
+        ul.innerHTML += `
+            <li>
                 <b>${p.nombre}</b><br>
                 ${p.marca}<br>
-                $${p.precio}
-            </li>`;
-        });
+                $${p.precio}<br>
+
+                ${p.imagen ? `<img src="/uploads/${p.imagen}">` : ""}
+
+                <br>
+
+                <input type="file" id="file-${p.id}" />
+                <button onclick="subirImagen(${p.id})">
+                    Subir imagen
+                </button>
+            </li>
+        `;
+    });
+})
+.catch(() => alert("Error al cargar productos"));
+
+function subirImagen(productoId) {
+
+    const fileInput = document.getElementById(`file-${productoId}`);
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert("Seleccioná una imagen");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("archivo", file);
+
+    fetch(`http://localhost:8080/productos/${productoId}/imagen`, {
+        method: "POST",
+        body: formData
     })
-    .catch(() => alert("Error al cargar productos"));
+    .then(res => {
+        if (!res.ok) throw new Error("Error al subir imagen");
+        return res.text();
+    })
+    .then(() => {
+        alert("Imagen subida correctamente");
+        location.reload();
+    })
+    .catch(err => alert(err.message));
+}
 </script>
 
 </body>
