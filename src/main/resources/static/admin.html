@@ -3,134 +3,213 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Productos</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #f4f6f8;
-        }
+    <title>Panel Admin | BodyPaint</title>
 
-        .container {
-            width: 400px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        input,
-        button {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-        }
-
-        button {
-            background: #6c63ff;
-            color: white;
-            border: none;
-        }
-
-        #msg {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-    <div class="container">
-        <h2>Crear Producto</h2>
+<div class="navbar">
+
+    <div class="logo">
+        👑 Admin Panel
+    </div>
+
+    <div class="nav-links">
+
+        <a href="index.html">
+            <button>Inicio</button>
+        </a>
+
+        <a href="producto.html">
+            <button>Productos</button>
+        </a>
+
+    </div>
+
+</div>
+
+<div class="admin-page">
+
+    <div class="admin-login" id="loginBox">
+
+        <h1>Ingreso Administrador</h1>
+
+        <input
+                type="email"
+                id="adminEmail"
+                placeholder="Email admin"
+        >
+
+        <input
+                type="password"
+                id="adminPass"
+                placeholder="Contraseña"
+        >
+
+        <button onclick="loginAdmin()">
+            Ingresar
+        </button>
+
+        <p id="loginMsg"></p>
+
+    </div>
+
+    <div
+            class="admin-panel hidden"
+            id="adminPanel"
+    >
+
+        <h1>Crear Producto</h1>
 
         <form id="formProducto">
-            <input id="nombre" placeholder="Nombre" required>
-            <input id="marca" placeholder="Marca" required>
-            <input id="precio" type="number" placeholder="Precio" required>
-            <input id="stock" type="number" placeholder="Stock" required>
 
-            <button type="submit">Crear</button>
+            <input
+                    id="nombre"
+                    placeholder="Nombre"
+                    required
+            >
+
+            <input
+                    id="marca"
+                    placeholder="Marca"
+                    required
+            >
+
+            <input
+                    id="precio"
+                    type="number"
+                    placeholder="Precio"
+                    required
+            >
+
+            <input
+                    id="stock"
+                    type="number"
+                    placeholder="Stock"
+                    required
+            >
+
+            <button type="submit">
+                Crear Producto
+            </button>
+
         </form>
 
         <p id="msg"></p>
-        <hr>
 
-        <h2>Cancelar entrega de pedido</h2>
-
-        <input id="pedidoId" type="number" placeholder="ID del pedido">
-        <input id="motivo" placeholder="Motivo de cancelación">
-
-        <button onclick="cancelarPedido()">Cancelar pedido</button>
-
-        <p id="msgCancelacion"></p>
     </div>
 
-    <script>
-        document.getElementById("formProducto").addEventListener("submit", async e => {
+</div>
+
+<script>
+
+    const API = "http://localhost:8080";
+
+    let token = "";
+
+    function loginAdmin(){
+
+        const email =
+            document.getElementById("adminEmail").value;
+
+        const pass =
+            document.getElementById("adminPass").value;
+
+        if(
+            email === "admin@bodypaint.com"
+            &&
+            pass === "1234"
+        ){
+
+            token =
+                "Basic " + btoa(email + ":" + pass);
+
+            document
+                .getElementById("loginBox")
+                .classList.add("hidden");
+
+            document
+                .getElementById("adminPanel")
+                .classList.remove("hidden");
+
+        }else{
+
+            document.getElementById("loginMsg")
+                .innerHTML =
+                "❌ Credenciales incorrectas";
+        }
+    }
+
+    document
+        .getElementById("formProducto")
+        .addEventListener("submit", async e => {
+
             e.preventDefault();
 
-            const msg = document.getElementById("msg");
-
             const producto = {
-                nombre: nombre.value,
-                marca: marca.value,
-                precio: parseFloat(precio.value),
-                stock: parseInt(stock.value)
+
+                nombre:
+                    document.getElementById("nombre").value,
+
+                marca:
+                    document.getElementById("marca").value,
+
+                precio:
+                    parseFloat(
+                        document.getElementById("precio").value
+                    ),
+
+                stock:
+                    parseInt(
+                        document.getElementById("stock").value
+                    )
             };
 
-            try {
-                const res = await fetch("http://localhost:8080/productos", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Basic " + btoa("admin@bodypaint.com:1234")
-                    },
-                    body: JSON.stringify(producto)
-                });
+            try{
 
-                const data = await res.json();
+                const res =
+                    await fetch(`${API}/productos`,{
 
-                if (!res.ok) {
-                    msg.innerText = "❌ " + (data.errors ? data.errors.join(", ") : data.message);
+                        method:"POST",
+
+                        headers:{
+                            "Content-Type":"application/json",
+                            "Authorization": token
+                        },
+
+                        body: JSON.stringify(producto)
+                    });
+
+                const data =
+                    await res.json();
+
+                if(!res.ok){
+
+                    document.getElementById("msg")
+                        .innerHTML =
+                        "❌ Error al crear producto";
+
                     return;
                 }
 
-                msg.innerText = "✅ Producto creado correctamente";
-                formProducto.reset();
+                document.getElementById("msg")
+                    .innerHTML =
+                    "✅ Producto creado correctamente";
 
-            } catch (err) {
-                msg.innerText = "❌ Error de conexión con el servidor";
+                document.getElementById("formProducto")
+                    .reset();
+
+            }catch(e){
+
+                document.getElementById("msg")
+                    .innerHTML =
+                    "❌ Error de conexión";
             }
         });
-        async function cancelarPedido() {
-            const id = document.getElementById("pedidoId").value;
-            const motivo = document.getElementById("motivo").value;
-            const msg = document.getElementById("msgCancelacion");
 
-            try {
-                const res = await fetch(`http://localhost:8080/pedidos/${id}/cancelar`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Basic " + btoa("admin@bodypaint.com:1234")
-                    },
-                    body: JSON.stringify({ motivo: motivo })
-                });
-
-                const text = await res.text();
-
-                if (!res.ok) {
-                    msg.innerText = "❌ " + text;
-                    return;
-                }
-
-                msg.innerText = "✅ Pedido cancelado correctamente";
-
-            } catch (err) {
-                msg.innerText = "❌ Error de conexión con el servidor";
-            }
-        }
-    </script>
+</script>
 
 </body>
 
