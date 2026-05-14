@@ -25,4 +25,14 @@ public class CarritoDeleteController {
 
         return BaseResponse.ok(carrito, "Carrito vaciado");
     }
+    @DeleteMapping("/{id}/quitar/{productoId}")
+    public BaseResponse<Carrito> quitar(
+            @PathVariable Long id,
+            @PathVariable Long productoId
+    ) {
+
+        Carrito carrito = carritoService.quitarProducto(id, productoId);
+
+        return BaseResponse.ok(carrito, "Producto eliminado del carrito");
+    }
 }

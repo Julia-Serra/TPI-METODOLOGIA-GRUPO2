@@ -1,10 +1,6 @@
 package com.metodologia.bodyPaint.feature.controllers.post;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.metodologia.bodyPaint.config.BaseResponse;
 import com.metodologia.bodyPaint.feature.dtos.request.AgregarProductoCarritoRequest;
@@ -41,5 +37,20 @@ public class CarritoPostController {
         );
 
         return BaseResponse.ok(carrito, "Producto agregado al carrito");
+    }
+    @PutMapping("/{id}/modificar/{productoId}")
+    public BaseResponse<Carrito> modificarCantidad(
+            @PathVariable Long id,
+            @PathVariable Long productoId,
+            @RequestParam int cantidad
+    ) {
+
+        Carrito carrito = carritoService.modificarCantidad(
+                id,
+                productoId,
+                cantidad
+        );
+
+        return BaseResponse.ok(carrito, "Cantidad modificada");
     }
 }

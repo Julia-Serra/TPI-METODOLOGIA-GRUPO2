@@ -13,13 +13,20 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Carrito {
+
     @Id
     @GeneratedValue
     private Long id;
 
-    @OneToOne
-    private Cliente cliente;
-
     @OneToMany(cascade = CascadeType.ALL)
     private List<ItemCarrito> items = new ArrayList<>();
+
+    public double getTotal() {
+
+        return items.stream()
+                .mapToDouble(i ->
+                        i.getProducto().getPrecio() * i.getCantidad()
+                )
+                .sum();
+    }
 }
