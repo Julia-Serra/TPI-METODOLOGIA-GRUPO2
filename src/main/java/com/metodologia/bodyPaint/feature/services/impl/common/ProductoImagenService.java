@@ -1,6 +1,10 @@
 package com.metodologia.bodyPaint.feature.services.impl.common;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import org.springframework.stereotype.Service;
 
@@ -17,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 public class ProductoImagenService implements IProductoImagenService {
 
     private final ProductoRepository productoRepository;
+    // Define la ruta física apuntando a la carpeta 'uploads'
+    private final Path rootFolder = Paths.get("uploads"); 
 
     @Override
     public void importarImagen(Long productoId, ImportarImagenRequest request) {
@@ -32,10 +38,25 @@ public class ProductoImagenService implements IProductoImagenService {
             throw new BadRequestException("Debe enviar una imagen");
         }
 
-        String nombreArchivo = request.getArchivo().getOriginalFilename();
+        try {
+            String nombreArchivo = request.getArchivo().getOriginalFilename();
+            
+            // Crea el directorio de almacenamiento si no existe en la raíz
+            if (!Files.exists(rootFolder)) {
+                Files.createDirectories(rootFolder);
+            }
 
-        producto.setImagen(nombreArchivo);
+            // Transfiere los bytes del archivo MultipartFile al disco duro
+            Files.copy(request.getArchivo().getInputStream(), 
+                       this.rootFolder.resolve(nombreArchivo), 
+                       StandardCopyOption.REPLACE_EXISTING);
 
-        productoRepository.save(producto);
+            // Guarda exclusivamente el nombre plano del archivo en la base de datos
+            producto.setImagen(nombreArchivo);
+            productoRepository.save(producto);
+
+        } catch (IOException e) {
+            throw new BadRequestException("Error al escribir el archivo en el servidor: " + e.getMessage());
+        }
     }
 }
