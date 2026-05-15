@@ -56,13 +56,15 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<Object>> handleGeneric(Exception ex) {
-        // En producción, no mostrar el ex.getMessage() detallado para evitar fugas de info
+
+        ex.printStackTrace();
+
         BaseResponse<Object> response = BaseResponse.builder()
                 .message("Ocurrió un error inesperado")
-                .errors(List.of("Contacte al administrador"))
+                .errors(List.of(ex.getMessage()))
                 .timestamp(Instant.now().toString())
                 .build();
 
-        return ResponseEntity.internalServerError().body(response); 
+        return ResponseEntity.internalServerError().body(response);
     }
 }
