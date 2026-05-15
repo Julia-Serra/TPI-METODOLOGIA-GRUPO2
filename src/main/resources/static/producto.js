@@ -11,30 +11,32 @@ fetch(`${API}/productos`)
 
     data.data.forEach(p => {
 
-        grid.innerHTML += `
+        const card = document.createElement("div");
+        card.className = "producto-card";
 
-            <div class="producto-card">
-
-                <img src="https://via.placeholder.com/300x250">
-
-                <h3>${p.nombre}</h3>
-
-                <p>${p.marca}</p>
-
-                <p class="precio">
-                    $${p.precio}
-                </p>
-
-                <p class="stock">
-                    Stock: ${p.stock}
-                </p>
-
-                <button onclick="agregar(${p.id})">
-                    Agregar al carrito
-                </button>
-
+        card.innerHTML = `
+            <div class="producto-img-container">
+                <img src="${API}/uploads/${p.imagen}" 
+                    onerror="this.src='https://via.placeholder.com/300x250'">
             </div>
+            
+            <h3>${p.nombre}</h3>
+            <p>${p.marca}</p>
+
+            <p class="precio">
+                $${p.precio}
+            </p>
+
+            <p class="stock">
+                Stock: ${p.stock}
+            </p>
+
+            <button onclick="agregar(${p.id})">
+                Agregar al carrito
+            </button>
         `;
+
+        grid.appendChild(card);
     });
 });
 
