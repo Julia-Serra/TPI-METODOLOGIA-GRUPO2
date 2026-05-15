@@ -1,53 +1,454 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f8;
-    margin: 0;
-    padding: 0;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
 }
 
-.container {
-    width: 400px;
-    margin: 50px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+body{
+    background:
+    linear-gradient(
+        135deg,
+        #120018,
+        #2d0b52,
+        #6c63ff
+    );
+
+    min-height:100vh;
+    color:white;
 }
 
-h1, h2 {
-    text-align: center;
+/* NAVBAR */
+
+.navbar{
+    width:100%;
+    padding:20px 50px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    background:rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(12px);
 }
 
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+.logo{
+    font-size:32px;
+    font-weight:700;
 }
 
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #6c63ff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.nav-links{
+    display:flex;
+    gap:15px;
 }
 
-button:hover {
-    background-color: #5548d9;
+.nav-links button{
+    padding:12px 20px;
+
+    border:none;
+    border-radius:14px;
+
+    background:#ff4fd8;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:600;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
+/* HERO */
+
+.hero{
+    min-height:85vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:50px;
 }
 
-li {
-    background: #eee;
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 5px;
+.hero-content{
+    width:1200px;
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:50px;
+    align-items:center;
+}
+
+.hero-text h1{
+    font-size:72px;
+}
+
+.hero-text span{
+    color:#ff4fd8;
+}
+
+.hero-text p{
+    margin:20px 0;
+    line-height:1.8;
+    color:#ddd;
+}
+
+.hero-buttons{
+    display:flex;
+    gap:15px;
+}
+
+.hero-buttons button{
+    padding:15px 25px;
+
+    border:none;
+    border-radius:14px;
+
+    cursor:pointer;
+
+    font-weight:600;
+}
+
+.btn-primary{
+    background:#6c63ff;
+    color:white;
+}
+
+.btn-secondary{
+    background:#ff4fd8;
+    color:white;
+}
+
+/* HERO CARD */
+
+.hero-card{
+    height:500px;
+
+    background:
+    rgba(255,255,255,0.08);
+
+    border-radius:30px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    backdrop-filter:blur(10px);
+}
+
+.hero-icon{
+    font-size:120px;
+}
+
+/* CONTAINERS */
+
+.container{
+    width:1200px;
+    margin:auto;
+    padding:40px 0;
+}
+
+.container-form{
+    width:450px;
+
+    margin:60px auto;
+
+    background:
+    rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(12px);
+
+    padding:30px;
+
+    border-radius:25px;
+}
+
+/* FORM */
+
+form{
+    display:flex;
+    flex-direction:column;
+}
+
+input{
+    margin:10px 0;
+
+    padding:14px;
+
+    border:none;
+    border-radius:12px;
+}
+
+form button{
+    margin-top:15px;
+
+    padding:14px;
+
+    border:none;
+    border-radius:12px;
+
+    background:#6c63ff;
+
+    color:white;
+
+    font-weight:600;
+
+    cursor:pointer;
+}
+
+/* TITULO */
+
+.titulo{
+    text-align:center;
+    margin-bottom:40px;
+    font-size:45px;
+}
+
+/* PRODUCTOS */
+
+.productos-grid{
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fit,minmax(280px,1fr));
+
+    gap:30px;
+}
+
+.producto-card{
+    background:
+    rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(12px);
+
+    border-radius:25px;
+
+    padding:20px;
+}
+
+.producto-card img{
+    width:100%;
+    height:250px;
+
+    object-fit:cover;
+
+    border-radius:20px;
+}
+
+.producto-card h3{
+    margin-top:15px;
+}
+
+.precio{
+    color:#ff4fd8;
+    font-size:24px;
+    font-weight:700;
+}
+
+.stock{
+    color:#ddd;
+}
+
+.producto-card button{
+    width:100%;
+    margin-top:15px;
+
+    padding:14px;
+
+    border:none;
+    border-radius:14px;
+
+    background:#6c63ff;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+/* CARRITO */
+
+.layout{
+    width:1200px;
+    margin:auto;
+    padding:40px 0;
+}
+
+.carrito{
+    background:
+    rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(12px);
+
+    border-radius:25px;
+
+    padding:25px;
+}
+
+.item{
+    background:
+    rgba(255,255,255,0.08);
+
+    padding:15px;
+
+    border-radius:18px;
+
+    margin-bottom:15px;
+}
+
+.acciones{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
+
+.acciones button{
+    flex:1;
+
+    border:none;
+
+    padding:10px;
+
+    border-radius:10px;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+.btn-sumar{
+    background:#28a745;
+}
+
+.btn-restar{
+    background:#ff9800;
+}
+
+.btn-eliminar{
+    background:#dc3545;
+}
+
+.total{
+    margin-top:20px;
+
+    font-size:28px;
+    font-weight:700;
+}
+
+.btn-vaciar{
+    width:100%;
+    margin-top:20px;
+
+    padding:15px;
+
+    border:none;
+    border-radius:14px;
+
+    background:#dc3545;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+.empty{
+    text-align:center;
+    color:#ddd;
+}
+/* ADMIN */
+
+.admin-page{
+    min-height:90vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:40px;
+}
+
+.admin-login,
+.admin-panel{
+
+    width:450px;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(14px);
+
+    border-radius:25px;
+
+    padding:35px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.3);
+}
+
+.admin-login h1,
+.admin-panel h1{
+
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.admin-login input,
+.admin-panel input{
+
+    width:100%;
+
+    padding:15px;
+
+    margin-bottom:15px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:
+        rgba(255,255,255,0.12);
+
+    color:white;
+
+    font-size:15px;
+}
+
+.admin-login input::placeholder,
+.admin-panel input::placeholder{
+
+    color:#ddd;
+}
+
+.admin-login button,
+.admin-panel button{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#ff4fd8;
+
+    color:white;
+
+    font-size:16px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.admin-login button:hover,
+.admin-panel button:hover{
+
+    background:#ff2cc7;
+}
+
+.hidden{
+    display:none;
 }
