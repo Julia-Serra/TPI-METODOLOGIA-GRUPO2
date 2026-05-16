@@ -1,5 +1,6 @@
 package com.metodologia.bodyPaint.feature.services.impl.domain;
 
+import com.metodologia.bodyPaint.feature.models.Direccion;
 import org.springframework.stereotype.Service;
 
 import com.metodologia.bodyPaint.config.exceptions.BadRequestException;
@@ -11,6 +12,8 @@ import com.metodologia.bodyPaint.feature.services.interfaces.domain.IClienteCrea
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -29,5 +32,15 @@ public class ClienteCreateService implements IClienteCreateService {
 
     }
 
+    public void agregarDireccion(String email, Direccion direccion) {
 
+        Cliente cliente = clienteRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("Cliente no encontrado"));
+        if (cliente.getDirecciones() == null) {
+            cliente.setDirecciones(new ArrayList<>());
+        }
+        cliente.getDirecciones().add(direccion);
+
+        clienteRepository.save(cliente);
+    }
 }

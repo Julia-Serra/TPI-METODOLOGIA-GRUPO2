@@ -3,23 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <title>Registro</title>
+
     <style>
-        body { font-family: Arial; background:#f4f6f8; }
-        .container { width:400px; margin:50px auto; background:white; padding:20px; border-radius:10px; }
-        input, button { width:100%; padding:10px; margin:5px 0; }
-        button { background:#28a745; color:white; border:none; }
-        #msg { margin-top:10px; font-weight:bold; }
+        body {
+            font-family: Arial;
+            background: #f4f6f8;
+        }
+
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        hr {
+            margin: 30px 0;
+        }
+
+        #msg,
+        #msgDireccion {
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
+
     <h2>Registro Cliente</h2>
 
     <form id="formCliente">
+
         <input id="nombre" placeholder="Nombre" required>
         <input id="apellido" placeholder="Apellido" required>
         <input id="email" placeholder="Email" required>
+
         <input id="pais" placeholder="Pais" required>
         <input id="provincia" placeholder="Provincia" required>
         <input id="localidad" placeholder="Localidad" required>
@@ -30,48 +68,145 @@
     </form>
 
     <p id="msg"></p>
+
+    <hr>
+
+    <h2>Agregar domicilio</h2>
+
+    <form id="formDireccion">
+
+        <input id="dirEmail" placeholder="Email del cliente" required>
+
+        <input id="paisDir" placeholder="Pais" required>
+        <input id="provinciaDir" placeholder="Provincia" required>
+        <input id="localidadDir" placeholder="Localidad" required>
+        <input id="calleDir" placeholder="Calle" required>
+        <input id="numeroDir" placeholder="Numero" required>
+
+        <input id="pisoDir" placeholder="Piso (opcional)">
+        <input id="departamentoDir" placeholder="Departamento (opcional)">
+
+        <button type="submit">Agregar domicilio</button>
+    </form>
+
+    <p id="msgDireccion"></p>
+
 </div>
 
 <script>
-    document.getElementById("formCliente").addEventListener("submit", async e => {
-        e.preventDefault();
 
-        const msg = document.getElementById("msg");
+    // =========================
+    // REGISTRAR CLIENTE
+    // =========================
 
-        const cliente = {
-            nombre: nombre.value,
-            apellido: apellido.value,
-            email: email.value,
-            pais: pais.value,
-            provincia: provincia.value,
-            localidad: localidad.value,
-            calle: calle.value,
-            numero: numero.value
-        };
+    document.getElementById("formCliente")
+        .addEventListener("submit", async e => {
 
-        try {
-            const res = await fetch("http://localhost:8080/clientes", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(cliente)
-            });
+            e.preventDefault();
 
-            const data = await res.json();
+            const msg = document.getElementById("msg");
 
-            if (!res.ok) {
-                msg.innerText = "❌ " + (data.errors ? data.errors.join(", ") : data.message);
-                return;
+            const cliente = {
+                nombre: nombre.value,
+                apellido: apellido.value,
+                email: email.value,
+
+                pais: pais.value,
+                provincia: provincia.value,
+                localidad: localidad.value,
+                calle: calle.value,
+                numero: numero.value
+            };
+
+            try {
+
+                const res = await fetch(
+                    "http://localhost:8080/clientes",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(cliente)
+                    }
+                );
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    msg.innerText =
+                        "❌ " +
+                        (data.errors
+                            ? data.errors.join(", ")
+                            : data.message);
+                    return;
+                }
+
+                msg.innerText = "✅ Cliente registrado correctamente";
+                formCliente.reset();
+
+            } catch (err) {
+                msg.innerText = "❌ Error de conexión";
+            }
+        });
+
+    // =========================
+    // AGREGAR DIRECCION
+    // =========================
+
+    document.getElementById("formDireccion")
+        .addEventListener("submit", async e => {
+
+            e.preventDefault();
+
+            const formDireccion = document.getElementById("formDireccion");
+            const msg = document.getElementById("msgDireccion");
+
+            const email = document.getElementById("dirEmail").value;
+
+            const direccion = {
+                pais: paisDir.value,
+                provincia: provinciaDir.value,
+                localidad: localidadDir.value,
+                calle: calleDir.value,
+                numero: numeroDir.value,
+                piso: pisoDir.value,
+                departamento: departamentoDir.value
+            };
+
+            try {
+
+                const res = await fetch(
+                    `http://localhost:8080/clientes/${email}/direcciones`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(direccion)
+                    }
+                );
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    msg.innerText =
+                        "❌ " +
+                        (data.errors
+                            ? data.errors.join(", ")
+                            : data.message);
+                    return;
+                }
+
+                msg.innerText = "✅ Dirección agregada correctamente";
+                formDireccion.reset();
+
+            } catch (err) {
+                msg.innerText = "❌ Error de conexión";
             }
 
-            msg.innerText = "✅ Cliente registrado correctamente";
-            formCliente.reset();
+        });
 
-        } catch (err) {
-            msg.innerText = "❌ Error de conexión";
-        }
-    });
 </script>
 
 </body>

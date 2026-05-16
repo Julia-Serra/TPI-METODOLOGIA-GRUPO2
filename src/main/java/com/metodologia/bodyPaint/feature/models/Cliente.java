@@ -1,17 +1,13 @@
 package com.metodologia.bodyPaint.feature.models;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.List;
+import jakarta.persistence.OneToMany;
 
 @Entity
 @Getter
@@ -35,6 +31,7 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Direccion direccion;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cliente_id")
+    private List<Direccion> direcciones;
 }

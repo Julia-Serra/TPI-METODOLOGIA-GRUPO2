@@ -37,6 +37,7 @@ public class SecurityConfig {
                         // API PÚBLICA
                         .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/direcciones").permitAll()
 
                         // SOLO ADMIN
                         .requestMatchers(HttpMethod.POST, "/productos").hasRole("ADMIN")

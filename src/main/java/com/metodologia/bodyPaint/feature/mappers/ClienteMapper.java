@@ -3,6 +3,7 @@ package com.metodologia.bodyPaint.feature.mappers;
 import com.metodologia.bodyPaint.feature.dtos.request.ClienteRequest;
 import com.metodologia.bodyPaint.feature.models.Cliente;
 import com.metodologia.bodyPaint.feature.models.Direccion;
+import java.util.List;
 
 public class ClienteMapper {
 
@@ -24,7 +25,7 @@ public class ClienteMapper {
                 .nombre(request.getNombre())
                 .apellido(request.getApellido())
                 .email(request.getEmail())
-                .direccion(direccion)
+                .direcciones(List.of(direccion))
                 .build();
     }
 }

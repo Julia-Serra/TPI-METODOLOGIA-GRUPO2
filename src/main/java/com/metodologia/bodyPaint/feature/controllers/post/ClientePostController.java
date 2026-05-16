@@ -1,15 +1,14 @@
 package com.metodologia.bodyPaint.feature.controllers.post;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.metodologia.bodyPaint.config.BaseResponse;
 import com.metodologia.bodyPaint.feature.dtos.request.ClienteRequest;
 import com.metodologia.bodyPaint.feature.mappers.ClienteMapper;
 import com.metodologia.bodyPaint.feature.models.Cliente;
 import com.metodologia.bodyPaint.feature.services.interfaces.domain.IClienteCreateService;
+import com.metodologia.bodyPaint.feature.dtos.request.DireccionRequest;
+import com.metodologia.bodyPaint.feature.models.Direccion;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +28,24 @@ public class ClientePostController {
         clienteCreateService.crear(cliente);
 
         return BaseResponse.ok(null,"Cliente creado");
+    }
+    @PostMapping("/{email}/direcciones")
+    public BaseResponse<Void> agregarDireccion(
+            @PathVariable String email,
+            @Valid @RequestBody DireccionRequest request) {
+
+        Direccion direccion = Direccion.builder()
+                .pais(request.getPais())
+                .provincia(request.getProvincia())
+                .localidad(request.getLocalidad())
+                .calle(request.getCalle())
+                .numero(request.getNumero())
+                .piso(request.getPiso())
+                .departamento(request.getDepartamento())
+                .build();
+
+        clienteCreateService.agregarDireccion(email, direccion);
+
+        return BaseResponse.ok(null, "Dirección agregada");
     }
 }
