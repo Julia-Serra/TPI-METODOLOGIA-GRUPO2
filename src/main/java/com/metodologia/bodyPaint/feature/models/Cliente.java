@@ -30,7 +30,6 @@ public class Cliente {
 
     @Enumerated(EnumType.STRING)
     private Rol rol;
-
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "cliente_id")
     private List<Direccion> direcciones;

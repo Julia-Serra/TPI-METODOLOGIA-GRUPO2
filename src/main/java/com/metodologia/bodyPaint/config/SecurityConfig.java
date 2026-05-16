@@ -42,6 +42,10 @@ public class SecurityConfig {
                         // SOLO ADMIN
                         .requestMatchers(HttpMethod.POST, "/productos").hasRole("ADMIN")
 
+                        //permitir subir img
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/productos/*/imagen").permitAll()
+
                         // RESTO PROTEGIDO
                         .anyRequest().authenticated()
                 )

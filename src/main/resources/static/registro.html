@@ -4,67 +4,30 @@
     <meta charset="UTF-8">
     <title>Registro</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #f4f6f8;
-        }
-
-        .container {
-            width: 400px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-        }
-
-        button {
-            background: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        h2 {
-            margin-top: 0;
-        }
-
-        hr {
-            margin: 30px 0;
-        }
-
-        #msg,
-        #msgDireccion {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="container">
+<div class="container-form">
 
-    <h2>Registro Cliente</h2>
+    <h2>
+        Registro Cliente
+    </h2>
 
     <form id="formCliente">
-
         <input id="nombre" placeholder="Nombre" required>
         <input id="apellido" placeholder="Apellido" required>
         <input id="email" placeholder="Email" required>
-
         <input id="pais" placeholder="Pais" required>
         <input id="provincia" placeholder="Provincia" required>
         <input id="localidad" placeholder="Localidad" required>
         <input id="calle" placeholder="Calle" required>
         <input id="numero" placeholder="Numero" required>
 
-        <button type="submit">Registrar</button>
+        <button type="submit">
+            Registrarse
+        </button>
+
     </form>
 
     <p id="msg"></p>
@@ -94,29 +57,22 @@
 </div>
 
 <script>
+    document.getElementById("formCliente").addEventListener("submit", async e => {
+        e.preventDefault();
 
-    // =========================
-    // REGISTRAR CLIENTE
-    // =========================
+        const msg =
+            document.getElementById("msg");
 
-    document.getElementById("formCliente")
-        .addEventListener("submit", async e => {
-
-            e.preventDefault();
-
-            const msg = document.getElementById("msg");
-
-            const cliente = {
-                nombre: nombre.value,
-                apellido: apellido.value,
-                email: email.value,
-
-                pais: pais.value,
-                provincia: provincia.value,
-                localidad: localidad.value,
-                calle: calle.value,
-                numero: numero.value
-            };
+        const cliente = {
+            nombre: nombre.value,
+            apellido: apellido.value,
+            email: email.value,
+            pais: pais.value,
+            provincia: provincia.value,
+            localidad: localidad.value,
+            calle: calle.value,
+            numero: numero.value
+        };
 
             try {
 
@@ -133,26 +89,20 @@
 
                 const data = await res.json();
 
-                if (!res.ok) {
-                    msg.innerText =
-                        "❌ " +
-                        (data.errors
-                            ? data.errors.join(", ")
-                            : data.message);
-                    return;
-                }
+            if (!res.ok) {
+                msg.innerText = "❌ " + (data.errors ? data.errors.join(", ") : data.message);
+                return;
+            }
 
-                msg.innerText = "✅ Cliente registrado correctamente";
+                msg.innerText =
+                "✅ Cliente registrado";
+
                 formCliente.reset();
 
             } catch (err) {
                 msg.innerText = "❌ Error de conexión";
             }
         });
-
-    // =========================
-    // AGREGAR DIRECCION
-    // =========================
 
     document.getElementById("formDireccion")
         .addEventListener("submit", async e => {
