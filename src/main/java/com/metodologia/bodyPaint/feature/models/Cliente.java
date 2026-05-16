@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.List;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 @Getter
@@ -30,7 +32,10 @@ public class Cliente {
 
     @Enumerated(EnumType.STRING)
     private Rol rol;
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cliente_id")
+    @ElementCollection
+    @CollectionTable(
+            name ="cliente_direcciones",
+            joinColumns = @JoinColumn(name = "cliente_id")
+    )
     private List<Direccion> direcciones;
 }
