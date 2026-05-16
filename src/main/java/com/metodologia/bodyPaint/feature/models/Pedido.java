@@ -54,4 +54,11 @@ public class Pedido {
         this.estado = EstadoPedido.CANCELADO;
         this.motivoCancelacion = motivo;
     }
+
+    public void actualizarEstado(EstadoPedido nuevoEstado) {
+        if (this.estado == EstadoPedido.CANCELADO) {
+            throw new BadRequestException("No se puede modificar el estado de un pedido CANCELADO");
+        }
+        this.estado = nuevoEstado;
+    }
 }
