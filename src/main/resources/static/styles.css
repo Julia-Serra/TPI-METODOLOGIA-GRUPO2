@@ -467,3 +467,54 @@ form button{
 .hidden{
     display:none;
 }
+
+.pedido-box{
+
+    background: rgba(255,255,255,0.08);
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    margin-top: 20px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.pedido-box input,
+.pedido-box select{
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    border: 1px solid #ccc;
+
+    font-size: 15px;
+}
+
+.btn-confirmar{
+
+    background: #111;
+
+    color: white;
+
+    border: none;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+}
+
+.btn-confirmar:hover{
+
+    opacity: 0.9;
+}
