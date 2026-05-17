@@ -1,102 +1,75 @@
 const API = "http://localhost:8080";
+const auth = JSON.parse(localStorage.getItem("auth"));
+
+if (!auth) {
+    window.location.href = "login.html";
+}
+
+if (auth.rol !== "ROLE_CLIENTE") {
+    window.location.href = "productos.html";
+}
+
 let clienteActual = null;
 
 let carritoId = localStorage.getItem("carritoId");
 
-async function iniciar(){
+async function iniciar() {
 
-    if(!carritoId){
-
-        const res = await fetch(`${API}/carritos`,{
-            method:"POST"
+    if (!carritoId) {
+        const res = await fetch(`${API}/carritos`, {
+            method: "POST",
+            headers: authHeaders()
         });
 
         const data = await res.json();
-
         carritoId = data.data.id;
 
-        localStorage.setItem(
-            "carritoId",
-            carritoId
-        );
+        localStorage.setItem("carritoId", carritoId);
     }
+
     await cargarCliente();
-    cargar();
+    await cargar();
 }
 
-async function cargar(){
+async function cargar() {
 
     const res = await fetch(
-        `${API}/carritos/${carritoId}`
+        `${API}/carritos/${carritoId}`,
+        { headers: authHeaders() }
     );
 
-    const data = await res.json();
-    if(!data.data){
+    if (res.status === 404) {
         localStorage.removeItem("carritoId");
         location.reload();
         return;
-    } //RECIEN
-    const carrito = data.data;
-    if(!carrito){
-        alert("Error cargando carrito");
-        return;
     }
 
-    const div = document.getElementById("items");
+    const data = await res.json();
+    const carrito = data.data;
 
+    const div = document.getElementById("items");
     div.innerHTML = "";
 
-    if(carrito.items.length === 0){
-
-        div.innerHTML =
-            `<p class="empty">
-                Tu carrito está vacío 🛒
-            </p>`;
-
-        document.getElementById("total")
-            .innerHTML = "Total: $0";
-
+    if (carrito.items.length === 0) {
+        div.innerHTML = `<p class="empty">Tu carrito está vacío 🛒</p>`;
+        document.getElementById("total").innerHTML = "Total: $0";
         return;
     }
 
     carrito.items.forEach(item => {
-
         const subtotal = item.producto.precio * item.cantidad;
 
         div.innerHTML += `
             <div class="item">
-
                 <h3>${item.producto.nombre}</h3>
-
                 <p>Cantidad: ${item.cantidad}</p>
-
                 <p>Subtotal: $${subtotal}</p>
 
                 <div class="acciones">
-
-                    <button
-                        class="btn-sumar"
-                        onclick="modificar(${item.producto.id}, ${item.cantidad + 1})"
-                    >
-                        +
-                    </button>
-
-                    <button
-                        class="btn-restar"
-                        onclick="modificar(${item.producto.id}, ${item.cantidad - 1})"
-                    >
-                        -
-                    </button>
-
-                    <button
-                        class="btn-eliminar"
-                        onclick="eliminar(${item.producto.id})"
-                    >
-                        Eliminar
-                    </button>
-
+                    <button onclick="modificar(${item.producto.id}, ${item.cantidad + 1})">+</button>
+                    <button onclick="modificar(${item.producto.id}, ${item.cantidad - 1})">-</button>
+                    <button onclick="eliminar(${item.producto.id})">Eliminar</button>
                 </div>
-
             </div>
         `;
     });
@@ -105,7 +78,7 @@ async function cargar(){
         .innerHTML = `Total: $${carrito.total}`;
 }
 
-async function modificar(productoId,cantidad){
+async function modificar(productoId, cantidad){
 
     if(cantidad <= 0){
         eliminar(productoId);
@@ -115,19 +88,18 @@ async function modificar(productoId,cantidad){
     const res = await fetch(
         `${API}/carritos/${carritoId}/modificar/${productoId}?cantidad=${cantidad}`,
         {
-            method:"PUT"
+            method: "PUT",
+            headers: authHeaders()
         }
     );
 
     if(!res.ok){
-        // Intentamos leer el error del backend, si no viene usamos el mensaje por defecto
         let msgError = "Stock insuficiente";
         try {
             const dataError = await res.json();
             if(dataError && dataError.message) msgError = dataError.message;
         } catch(e) {}
 
-        // Alerta estética con SweetAlert2 para el límite de stock
         Swal.fire({
             title: '¡Atención!',
             text: msgError,
@@ -145,12 +117,13 @@ async function modificar(productoId,cantidad){
 
 async function eliminar(productoId){
 
-    await fetch(
-        `${API}/carritos/${carritoId}/quitar/${productoId}`,
-        {
-            method:"DELETE"
-        }
-    );
+await fetch(
+    `${API}/carritos/${carritoId}/quitar/${productoId}`,
+    {
+        method: "DELETE",
+        headers: authHeaders()
+    }
+);
 
     cargar();
 }
@@ -160,11 +133,11 @@ async function vaciar(){
     await fetch(
         `${API}/carritos/${carritoId}/vaciar`,
         {
-            method:"DELETE"
+            method: "DELETE",
+            headers: authHeaders()
         }
     );
 
-    // Alerta rápida para avisar que se vació correctamente
     Swal.fire({
         title: 'Carrito vacío',
         text: 'Se quitaron todos los productos',
@@ -183,51 +156,33 @@ async function cargarCliente() {
 
     const response = await fetch(
         `${API}/clientes/me`,
-        {
-            headers: {
-                "Authorization":
-                    "Basic " + btoa("cliente@bodypaint.com:1234")
-            }
-        }
+        { headers: authHeaders() }
     );
 
-    if(!response.ok){
-        alert("No se pudo cargar el cliente");
+    if (!response.ok) {
+        Swal.fire("Error", "No se pudo cargar el cliente", "error");
         return;
     }
 
-    clienteActual = await response.json();
+    const data = await response.json();
+    clienteActual = data.data;
 
     cargarDirecciones(clienteActual.direcciones);
 }
 async function confirmarPedido() {
-    if(clienteActual == null){
-        alert("Cliente no cargado");
+
+    const direccionIndex = document.getElementById("direccionSelect").value;
+    const formaPago = document.getElementById("formaPago").value;
+
+    if (direccionIndex === "" || formaPago === "") {
+        Swal.fire("Atención", "Complete los datos", "warning");
         return;
     }
 
-    const direccionIndex =
-        document.getElementById("direccionSelect").value;
-
-    const formaPago =
-        document.getElementById("formaPago").value;
-
-    if(direccionIndex === ""){
-        alert("Seleccione un domicilio");
-        return;
-    }
-
-    if(formaPago === ""){
-        alert("Seleccione forma de pago");
-        return;
-    }
-
-    const direccion =
-        clienteActual.direcciones[direccionIndex];
+    const direccion = clienteActual.direcciones[direccionIndex];
 
     const body = {
         carritoId: carritoId,
-        emailCliente: clienteActual.email,
         domicilioEnvio: direccion,
         formaPago: formaPago
     };
@@ -236,25 +191,18 @@ async function confirmarPedido() {
         `${API}/pedidos/confirmar`,
         {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization":
-                    "Basic " + btoa("cliente@bodypaint.com:1234")
-            },
+            headers: authHeaders(),
             body: JSON.stringify(body)
         }
     );
 
-    if(response.ok){
-        alert("Pedido confirmado");
-    } else {
-
-        const error = await response.text();
-
-        alert(error);
+    if (response.ok) {
+        Swal.fire("Éxito", "Pedido confirmado", "success");
+        localStorage.removeItem("carritoId");
+        location.reload();
     }
 }
-
+/*
 async function buscarCliente() {
 
     const email =
@@ -282,6 +230,7 @@ async function buscarCliente() {
         clienteActual.direcciones
     );
 }
+*/
 
 function cargarDirecciones(direcciones){
 
@@ -303,4 +252,17 @@ function cargarDirecciones(direcciones){
 
         select.appendChild(option);
     });
+}
+
+/*No repetir headers*/ 
+function authHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${auth.token}`
+    };
+}
+
+function logout(){
+    localStorage.removeItem("auth");
+    window.location.href = "index.html";
 }
