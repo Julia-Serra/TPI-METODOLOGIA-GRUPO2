@@ -3,7 +3,6 @@ const API = "http://localhost:8080";
 async function cargarPedidos() {
 
     try {
-
         const res = await fetch(`${API}/pedidos/pendientes`);
         const data = await res.json();
         const grid = document.getElementById("pedidosGrid");
@@ -37,25 +36,25 @@ async function cargarPedidos() {
                     <h3>Pedido #${pedido.id}</h3>
 
                     <p>
-                        Cliente:
-                        ${pedido.cliente.nombre}
+                        Cliente: 
+                        ${pedido.cliente.nombre} 
                         ${pedido.cliente.apellido}
                     </p>
 
                     <p>
-                        Email:
+                        Email: 
                         ${pedido.cliente.email}
                     </p>
 
                     <p>
-                        Forma de pago:
+                        Forma de pago: 
                         ${pedido.formaPago}
                     </p>
 
                     <p>
-                        Domicilio:
-                        ${pedido.domicilioEnvio.calle}
-                        ${pedido.domicilioEnvio.numero},
+                        Domicilio: 
+                        ${pedido.domicilioEnvio.calle} 
+                        ${pedido.domicilioEnvio.numero}, 
                         ${pedido.domicilioEnvio.localidad}
                     </p>
 
@@ -70,6 +69,17 @@ async function cargarPedidos() {
         });
 
     } catch (error) {
+        console.error(error);
+        
+        // Alerta estética si se cae el servidor o falla la conexión
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron cargar los pedidos pendientes',
+            icon: 'error',
+            confirmButtonColor: '#bc2e7e',
+            background: '#231932',
+            color: '#ffffff'
+        });
 
         document.getElementById("pedidosGrid").innerHTML = `
             <p class="empty">

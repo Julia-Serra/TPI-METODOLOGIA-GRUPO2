@@ -6,18 +6,17 @@ fetch(`${API}/productos`)
 
     console.log(data);
 
-    const productos =
-        data.data || data;
-
-    const grid =
-        document.getElementById("productosGrid");
+    const productos = data.data || data;
+    const grid = document.getElementById("productosGrid");
 
     grid.innerHTML = "";
 
     productos.forEach(p => {
 
         const card = document.createElement("div");
-        card.className = "producto-card";
+        
+        // Si el backend marca alerta, le sumamos la clase 'alerta-stock' a la tarjeta
+        card.className = p.alertaStockMinimo ? "producto-card alerta-stock" : "producto-card";
 
         card.innerHTML = `
             <div class="producto-img-container">
@@ -36,6 +35,12 @@ fetch(`${API}/productos`)
                 Stock: ${p.stock}
             </p>
 
+            ${p.alertaStockMinimo ? `
+                <div class="badge-advertencia">
+                    ⚠️ Stock bajo (Min: ${p.stockMinimo})
+                </div>
+            ` : ''}
+
             <button onclick="agregar(${p.id})">
                 Agregar al carrito
             </button>
@@ -50,21 +55,17 @@ fetch(`${API}/productos`)
 
 async function agregar(id){
 
-    let carritoId =
-        localStorage.getItem("carritoId");
+    let carritoId = localStorage.getItem("carritoId");
 
     try{
-
         // SI NO EXISTE -> CREAR
         if(!carritoId){
 
-            const resCarrito =
-                await fetch(`${API}/carritos`,{
-                    method:"POST"
-                });
+            const resCarrito = await fetch(`${API}/carritos`,{
+                method:"POST"
+            });
 
-            const dataCarrito =
-                await resCarrito.json();
+            const dataCarrito = await resCarrito.json();
 
             carritoId = dataCarrito.data.id;
 
@@ -74,20 +75,19 @@ async function agregar(id){
             );
         }
 
-        const res =
-            await fetch(
-                `${API}/carritos/${carritoId}/agregar`,
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":"application/json"
-                    },
-                    body: JSON.stringify({
-                        productoId:id,
-                        cantidad:1
-                    })
-                }
-            );
+        const res = await fetch(
+            `${API}/carritos/${carritoId}/agregar`,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    productoId:id,
+                    cantidad:1
+                })
+            }
+        );
 
         // SI EL CARRITO YA NO EXISTE
         if(res.status === 500){
@@ -102,18 +102,40 @@ async function agregar(id){
         const data = await res.json();
 
         if(!res.ok){
-
-            alert(data.errors);
+            // Alerta bonita de error personalizada (Fondo oscuro, botón violeta/rosa)
+            Swal.fire({
+                title: '¡Atención!',
+                text: data.errors || 'Stock insuficiente',
+                icon: 'warning',
+                confirmButtonColor: '#bc2e7e',
+                background: '#231932',
+                color: '#ffffff'
+            });
 
             return;
         }
 
-        alert("✅ Producto agregado");
+        // Alerta bonita de éxito personalizada
+        Swal.fire({
+            title: '¡Agregado!',
+            text: 'Producto agregado al carrito correctamente',
+            icon: 'success',
+            confirmButtonColor: '#bc2e7e',
+            background: '#231932',
+            color: '#ffffff',
+            timer: 2000 // Se cierra sola a los 2 segundos para que sea más dinámico
+        });
 
     }catch(err){
-
         console.log(err);
-
-        alert("Error de conexión");
+        
+        Swal.fire({
+            title: 'Error',
+            text: 'Error de conexión con el servidor',
+            icon: 'error',
+            confirmButtonColor: '#bc2e7e',
+            background: '#231932',
+            color: '#ffffff'
+        });
     }
 }
