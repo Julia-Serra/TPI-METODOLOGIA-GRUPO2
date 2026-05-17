@@ -98,7 +98,6 @@
 
             <button type="submit">
                 Crear Producto
-                
             </button>
             <br>
         </form>
@@ -106,7 +105,7 @@
         <p id="msg"></p>
         
 
-        <h2>  Importar imagen a producto</h2>
+        <h2>Importar imagen a producto</h2>
 
         <input id="productoIdImagen" type="number" placeholder="ID del producto">
 
@@ -115,6 +114,17 @@
         <button id="btnSubirImagen">Subir Imagen</button>
 
         <p id="msgImagen"></p>
+
+
+        <h2>Acciones de Catálogo</h2>
+        
+        <input id="productoIdBaja" type="number" placeholder="ID del producto a dar de baja">
+        
+        <button id="btnDarDeBaja" onclick="solicitarBajaProducto()" style="background-color: #881c1c; color: white;">
+            🗑️ Dar de Baja Producto
+        </button>
+        
+        <p id="msgBaja"></p>
 
     </div>
 
@@ -235,7 +245,7 @@
         });
 
 
-        document
+    document
     .getElementById("btnSubirImagen")
     .addEventListener("click", async () => {
 
@@ -283,6 +293,95 @@
                 "❌ Error de conexión";
         }
     });
+
+
+    // LÓGICA DE LA USER STORY: PETICIÓN DE BAJA LÓGICA
+    async function solicitarBajaProducto() {
+        const id = document.getElementById("productoIdBaja").value;
+        const msg = document.getElementById("msgBaja");
+
+        if (!id) {
+            Swal.fire({
+                title: 'Atención',
+                text: 'Por favor, ingresá el ID del producto que querés dar de baja.',
+                icon: 'warning',
+                confirmButtonColor: '#bc2e7e',
+                background: '#231932',
+                color: '#ffffff'
+            });
+            return;
+        }
+
+        const result = await Swal.fire({
+            title: '¿Confirmar baja?',
+            text: `El producto con ID #${id} se deshabilitará del catálogo de ventas.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#bc2e7e',
+            cancelButtonColor: '#444',
+            confirmButtonText: 'Sí, dar de baja',
+            cancelButtonText: 'Cancelar',
+            background: '#231932',
+            color: '#ffffff'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // CORRECCIÓN DE LA URL: Le agregamos /api antes de /productos
+                const res = await fetch(`${API}/api/productos/${id}/baja`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": token
+                    }
+                });
+
+                // Si tu backend devuelve un String plano en vez de JSON en caso de error, 
+                // primero manejamos la respuesta según su formato text/json para evitar romper el script
+                const contentType = res.headers.get("content-type");
+                let data;
+                if (contentType && contentType.includes("application/json")) {
+                    data = await res.json();
+                } else {
+                    data = { message: await res.text() };
+                }
+
+                if (!res.ok) {
+                    let errorMsg = data.message || 'Error al procesar la baja';
+                    
+                    Swal.fire({
+                        title: 'No se pudo dar de baja',
+                        text: errorMsg,
+                        icon: 'error',
+                        confirmButtonColor: '#bc2e7e',
+                        background: '#231932',
+                        color: '#ffffff'
+                    });
+                    
+                    msg.innerHTML = `❌ Error: ${errorMsg}`;
+                    return;
+                }
+
+                // Éxito completo (Prueba de usuario 1 pasa)
+                Swal.fire({
+                    title: '¡Dado de baja!',
+                    text: 'El producto se deshabilitó correctamente.',
+                    icon: 'success',
+                    confirmButtonColor: '#bc2e7e',
+                    background: '#231932',
+                    color: '#ffffff',
+                    timer: 2000
+                });
+
+                msg.innerHTML = "✅ Producto dado de baja correctamente.";
+                document.getElementById("productoIdBaja").value = "";
+
+            } catch (e) {
+                console.error(e);
+                Swal.fire('Error', 'No hay conexión con el servidor', 'error');
+                msg.innerHTML = "❌ Error de conexión con el servidor.";
+            }
+        }
+    }
 
 </script>
 

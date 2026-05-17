@@ -27,12 +27,15 @@ public class Producto {
     private double precio;
     private int stock;
 
-    // Se agrega el campo para la User Story
     @Column(name = "stock_minimo")
     private Integer stockMinimo;
 
     @Column(name = "imagen")
     private String imagen;
+
+    // Se agrega el campo para la User Story de Baja de Producto
+    @Builder.Default
+    private boolean activo = true;
 
     /* Solamente si el producto es nuevo se le puede cargar una imagen */
     public boolean esNuevo() {
