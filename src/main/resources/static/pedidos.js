@@ -32,38 +32,42 @@ async function cargarPedidos() {
 
             grid.innerHTML += `
                 <div class="producto-card">
-
+            
                     <h3>Pedido #${pedido.id}</h3>
-
+            
+                    <p>Cliente: ${pedido.cliente.nombre} ${pedido.cliente.apellido}</p>
+            
+                    <p>Email: ${pedido.cliente.email}</p>
+            
+                    <p>Forma de pago: ${pedido.formaPago}</p>
+            
+                    <p>Estado actual: ${pedido.estado}</p>
+            
                     <p>
-                        Cliente: 
-                        ${pedido.cliente.nombre} 
-                        ${pedido.cliente.apellido}
-                    </p>
-
-                    <p>
-                        Email: 
-                        ${pedido.cliente.email}
-                    </p>
-
-                    <p>
-                        Forma de pago: 
-                        ${pedido.formaPago}
-                    </p>
-
-                    <p>
-                        Domicilio: 
-                        ${pedido.domicilioEnvio.calle} 
-                        ${pedido.domicilioEnvio.numero}, 
+                        Domicilio:
+                        ${pedido.domicilioEnvio.calle}
+                        ${pedido.domicilioEnvio.numero},
                         ${pedido.domicilioEnvio.localidad}
                     </p>
-
+            
                     <h4>Productos</h4>
-
+            
                     <ul>
                         ${itemsHtml}
                     </ul>
-
+            
+                    <select id="estado-${pedido.id}">
+                        <option value="PENDIENTE_PREPARACION">PENDIENTE PREPARACION</option>
+                        <option value="CONFIRMADO">CONFIRMADO</option>
+                        <option value="LISTO">LISTO</option>
+                        <option value="ENTREGADO_POR_CORRERO">ENTREGADO POR CORREO</option>
+                        <option value="CANCELADO">CANCELADO</option>
+                    </select>
+            
+                    <button onclick="actualizarEstado(${pedido.id})">
+                        Actualizar
+                    </button>
+            
                 </div>
             `;
         });
@@ -86,6 +90,63 @@ async function cargarPedidos() {
                 Error al cargar pedidos
             </p>
         `;
+    }
+}
+
+async function actualizarEstado(idPedido) {
+
+    const estado =
+        document.getElementById(`estado-${idPedido}`).value;
+
+    if (!estado) {
+        alert("Seleccione un estado");
+        return;
+    }
+
+    try {
+
+        const res = await fetch(
+            `${API}/pedidos/${idPedido}/estado?estado=${estado}`,
+            {
+                method: "PUT"
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            Swal.fire({
+                title: 'Error',
+                text: data.message || "No se pudo actualizar",
+                icon: 'error',
+                confirmButtonColor: '#bc2e7e',
+                background: '#231932',
+                color: '#ffffff'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Actualizado',
+            text: 'Estado cambiado correctamente',
+            icon: 'success',
+            confirmButtonColor: '#bc2e7e',
+            background: '#231932',
+            color: '#ffffff'
+        });
+
+        cargarPedidos();
+
+    } catch (error) {
+
+        Swal.fire({
+            title: 'Error',
+            text: 'Error de conexión',
+            icon: 'error',
+            confirmButtonColor: '#bc2e7e',
+            background: '#231932',
+            color: '#ffffff'
+        });
     }
 }
 
