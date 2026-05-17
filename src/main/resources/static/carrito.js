@@ -20,7 +20,6 @@ async function iniciar(){
             carritoId
         );
     }
-    await cargarCliente();
     cargar();
 }
 
@@ -179,27 +178,7 @@ async function vaciar(){
 }
 
 iniciar();
-async function cargarCliente() {
 
-    const response = await fetch(
-        `${API}/clientes/me`,
-        {
-            headers: {
-                "Authorization":
-                    "Basic " + btoa("cliente@bodypaint.com:1234")
-            }
-        }
-    );
-
-    if(!response.ok){
-        alert("No se pudo cargar el cliente");
-        return;
-    }
-
-    clienteActual = await response.json();
-
-    cargarDirecciones(clienteActual.direcciones);
-}
 async function confirmarPedido() {
     if(clienteActual == null){
         alert("Cliente no cargado");

@@ -23,7 +23,6 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
 
-                        //
                         .requestMatchers(
                                 "/",
                                 "/index.html",
@@ -34,26 +33,21 @@ public class SecurityConfig {
                                 "/**/*.js"
                         ).permitAll()
 
-                        // API PÚBLICA
                         .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
                         .requestMatchers(HttpMethod.POST, "/direcciones").permitAll()
 
-                        // SOLO ADMIN
-                        .requestMatchers(HttpMethod.POST, "/productos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/productos")
+                        .permitAll()
 
-                        //permitir subir img
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/productos/*/imagen").permitAll()
 
-                        //nuevos
                         .requestMatchers("/carritos/**").permitAll()
                         .requestMatchers("/pedidos/**").permitAll()
 
-                        // RESTO PROTEGIDO
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults());
+                        .anyRequest().permitAll()
+                );
 
         return http.build();
     }

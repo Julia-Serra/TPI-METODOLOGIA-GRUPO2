@@ -542,3 +542,64 @@ form button{
 
     opacity: 0.9;
 }
+/* AGREGAR AL FINAL DE styles.css */
+
+.filtros{
+
+    display:grid;
+
+    grid-template-columns:
+            repeat(auto-fit,minmax(180px,1fr));
+
+    gap:15px;
+
+    margin-bottom:40px;
+}
+
+.filtros input{
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:12px;
+}
+
+.filtros button{
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#ff4fd8;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:600;
+}
+
+.producto-alerta-stock{
+
+    border:2px solid #ff9800;
+}
+
+.badge-alerta{
+
+    background:#ffe0b2;
+
+    color:#e65100;
+
+    padding:6px 10px;
+
+    border-radius:8px;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    margin-top:10px;
+
+    display:inline-block;
+}

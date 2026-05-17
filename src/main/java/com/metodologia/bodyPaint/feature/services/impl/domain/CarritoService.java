@@ -29,7 +29,11 @@ public class CarritoService {
             );
         }
 
-        Carrito carrito = carritoRepository.findById(carritoId).orElseThrow();
+        Carrito carrito = carritoRepository.findById(carritoId)
+                .orElseGet(() -> {
+                    Carrito nuevo = new Carrito();
+                    return carritoRepository.save(nuevo);
+                });
 
         Producto producto = productoRepository.findById(productoId).orElseThrow();
 

@@ -1,3 +1,4 @@
+<!-- producto.html -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -38,7 +39,54 @@
         Productos
     </h1>
 
-    <div class="productos-grid" id="productosGrid"></div>
+    <div class="filtros">
+
+        <input
+                type="text"
+                id="filtroNombre"
+                placeholder="Buscar por nombre"
+        >
+
+        <input
+                type="text"
+                id="filtroMarca"
+                placeholder="Buscar por marca"
+        >
+
+        <input
+                type="number"
+                id="precioMin"
+                placeholder="Precio mínimo"
+        >
+
+        <input
+                type="number"
+                id="precioMax"
+                placeholder="Precio máximo"
+        >
+
+        <input
+                type="number"
+                id="stockMin"
+                placeholder="Stock mínimo"
+        >
+
+        <input
+                type="number"
+                id="stockMax"
+                placeholder="Stock máximo"
+        >
+
+        <button onclick="filtrarProductos()">
+            Filtrar
+        </button>
+
+    </div>
+
+    <div
+            class="productos-grid"
+            id="productosGrid"
+    ></div>
 
 </div>
 

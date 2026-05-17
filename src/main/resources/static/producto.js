@@ -1,73 +1,168 @@
+// producto.js
+
 const API = "http://localhost:8080";
 
-fetch(`${API}/productos`)
-.then(res => res.json())
-.then(data => {
+cargarProductos();
 
-    console.log(data);
+async function cargarProductos(
+    url = `${API}/productos`
+){
 
-    const productos = data.data || data;
-    const grid = document.getElementById("productosGrid");
+    try{
 
-    grid.innerHTML = "";
+        const res =
+            await fetch(url);
 
-    productos.forEach(p => {
+        const data =
+            await res.json();
 
-        const card = document.createElement("div");
-        
-        // Si el backend marca alerta, le sumamos la clase 'alerta-stock' a la tarjeta
-        card.className = p.alertaStockMinimo ? "producto-card alerta-stock" : "producto-card";
+        const productos =
+            data.data || data;
 
-        card.innerHTML = `
-            <div class="producto-img-container">
-                <img src="${API}/uploads/${p.imagen}" 
-                    onerror="this.src='https://via.placeholder.com/300x250'">
-            </div>
-            
-            <h3>${p.nombre}</h3>
-            <p>${p.marca}</p>
+        const grid =
+            document.getElementById("productosGrid");
 
-            <p class="precio">
-                $${p.precio}
-            </p>
+        grid.innerHTML = "";
 
-            <p class="stock">
-                Stock: ${p.stock}
-            </p>
+        if(productos.length === 0){
 
-            ${p.alertaStockMinimo ? `
-                <div class="badge-advertencia">
-                    ⚠️ Stock bajo (Min: ${p.stockMinimo})
+            grid.innerHTML = `
+                <p class="empty">
+                    No se encontraron productos
+                </p>
+            `;
+
+            return;
+        }
+
+        productos.forEach(p => {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                p.alertaStockMinimo
+                    ? "producto-card producto-alerta-stock"
+                    : "producto-card";
+
+            card.innerHTML = `
+
+                <div class="producto-img-container">
+
+                    <img
+                        src="${API}/uploads/${p.imagen}"
+                        onerror="this.src='https://via.placeholder.com/300x250'"
+                    >
+
                 </div>
-            ` : ''}
 
-            <button onclick="agregar(${p.id})">
-                Agregar al carrito
-            </button>
-        `;
+                <h3>${p.nombre}</h3>
 
-        grid.appendChild(card);
-    });
-})
-.catch(err => {
-    console.log(err);
-});
+                <p>${p.marca}</p>
+
+                <p class="precio">
+                    $${p.precio}
+                </p>
+
+                <p class="stock">
+                    Stock: ${p.stock}
+                </p>
+
+                ${p.alertaStockMinimo
+                    ? `
+                        <div class="badge-alerta">
+                            ⚠️ Stock bajo
+                        </div>
+                    `
+                    : ''
+                }
+
+                <button onclick="agregar(${p.id})">
+                    Agregar al carrito
+                </button>
+            `;
+
+            grid.appendChild(card);
+        });
+
+    }catch(err){
+
+        Swal.fire({
+            title:'Error',
+            text:'No se pudieron cargar productos',
+            icon:'error',
+            confirmButtonColor:'#bc2e7e',
+            background:'#231932',
+            color:'#ffffff'
+        });
+    }
+}
+
+async function filtrarProductos(){
+
+    const nombre =
+        document.getElementById("filtroNombre").value;
+
+    const marca =
+        document.getElementById("filtroMarca").value;
+
+    const precioMin =
+        document.getElementById("precioMin").value;
+
+    const precioMax =
+        document.getElementById("precioMax").value;
+
+    const stockMin =
+        document.getElementById("stockMin").value;
+
+    const stockMax =
+        document.getElementById("stockMax").value;
+
+    const params =
+        new URLSearchParams();
+
+    if(nombre)
+        params.append("nombre", nombre);
+
+    if(marca)
+        params.append("marca", marca);
+
+    if(precioMin)
+        params.append("precioMin", precioMin);
+
+    if(precioMax)
+        params.append("precioMax", precioMax);
+
+    if(stockMin)
+        params.append("stockMin", stockMin);
+
+    if(stockMax)
+        params.append("stockMax", stockMax);
+
+    cargarProductos(
+        `${API}/productos/buscar?${params.toString()}`
+    );
+}
 
 async function agregar(id){
 
-    let carritoId = localStorage.getItem("carritoId");
+    let carritoId =
+        localStorage.getItem("carritoId");
 
     try{
-        // SI NO EXISTE -> CREAR
+
         if(!carritoId){
 
-            const resCarrito = await fetch(`${API}/carritos`,{
-                method:"POST"
-            });
+            const resCarrito =
+                await fetch(`${API}/carritos`,{
+                    method:"POST"
+                });
 
-            const dataCarrito = await resCarrito.json();
+            const dataCarrito =
+                await resCarrito.json();
 
-            carritoId = dataCarrito.data.id;
+            carritoId =
+                dataCarrito.data.id;
 
             localStorage.setItem(
                 "carritoId",
@@ -75,67 +170,59 @@ async function agregar(id){
             );
         }
 
-        const res = await fetch(
-            `${API}/carritos/${carritoId}/agregar`,
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body: JSON.stringify({
-                    productoId:id,
-                    cantidad:1
-                })
-            }
-        );
+        const res =
+            await fetch(
+                `${API}/carritos/${carritoId}/agregar`,
+                {
+                    method:"POST",
 
-        // SI EL CARRITO YA NO EXISTE
-        if(res.status === 500){
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
 
-            localStorage.removeItem("carritoId");
+                    body: JSON.stringify({
+                        productoId:id,
+                        cantidad:1
+                    })
+                }
+            );
 
-            agregar(id);
-
-            return;
-        }
-
-        const data = await res.json();
+        const data =
+            await res.json();
 
         if(!res.ok){
-            // Alerta bonita de error personalizada (Fondo oscuro, botón violeta/rosa)
+
             Swal.fire({
-                title: '¡Atención!',
-                text: data.errors || 'Stock insuficiente',
-                icon: 'warning',
-                confirmButtonColor: '#bc2e7e',
-                background: '#231932',
-                color: '#ffffff'
+                title:'Atención',
+                text:data.message || "Stock insuficiente",
+                icon:'warning',
+                confirmButtonColor:'#bc2e7e',
+                background:'#231932',
+                color:'#ffffff'
             });
 
             return;
         }
 
-        // Alerta bonita de éxito personalizada
         Swal.fire({
-            title: '¡Agregado!',
-            text: 'Producto agregado al carrito correctamente',
-            icon: 'success',
-            confirmButtonColor: '#bc2e7e',
-            background: '#231932',
-            color: '#ffffff',
-            timer: 2000 // Se cierra sola a los 2 segundos para que sea más dinámico
+            title:'Producto agregado',
+            text:'Se agregó correctamente al carrito',
+            icon:'success',
+            timer:1500,
+            showConfirmButton:false,
+            background:'#231932',
+            color:'#ffffff'
         });
 
     }catch(err){
-        console.log(err);
-        
+
         Swal.fire({
-            title: 'Error',
-            text: 'Error de conexión con el servidor',
-            icon: 'error',
-            confirmButtonColor: '#bc2e7e',
-            background: '#231932',
-            color: '#ffffff'
+            title:'Error',
+            text:'Error de conexión',
+            icon:'error',
+            confirmButtonColor:'#bc2e7e',
+            background:'#231932',
+            color:'#ffffff'
         });
     }
 }
