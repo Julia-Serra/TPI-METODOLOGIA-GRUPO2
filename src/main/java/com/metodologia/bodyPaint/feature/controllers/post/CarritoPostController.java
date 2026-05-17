@@ -1,5 +1,8 @@
 package com.metodologia.bodyPaint.feature.controllers.post;
 
+import java.security.Principal;
+
+
 import org.springframework.web.bind.annotation.*;
 
 import com.metodologia.bodyPaint.config.BaseResponse;
@@ -16,41 +19,39 @@ public class CarritoPostController {
 
     private final CarritoService carritoService;
 
-    @PostMapping
-    public BaseResponse<Carrito> crear() {
-
-        Carrito carrito = carritoService.crear();
-
-        return BaseResponse.ok(carrito, "Carrito creado");
+    @GetMapping("/mio")
+    public BaseResponse<Carrito> obtener(Principal principal){
+        return BaseResponse.ok(
+                carritoService.obtener(principal.getName()),
+                "Carrito del cliente");
     }
 
-    @PostMapping("/{id}/agregar")
+    @PostMapping("/agregar")
     public BaseResponse<Carrito> agregar(
-            @PathVariable Long id,
-            @RequestBody AgregarProductoCarritoRequest request
-    ) {
+            @RequestBody AgregarProductoCarritoRequest request,
+            Principal principal) {
 
-        Carrito carrito = carritoService.agregarProducto(
-                id,
-                request.getProductoId(),
-                request.getCantidad()
-        );
-
-        return BaseResponse.ok(carrito, "Producto agregado al carrito");
+        return BaseResponse.ok(
+                carritoService.agregarProducto(
+                        principal.getName(),
+                        request.getProductoId(),
+                        request.getCantidad()),
+                "Producto agregado");
     }
-    @PutMapping("/{id}/modificar/{productoId}")
-    public BaseResponse<Carrito> modificarCantidad(
-            @PathVariable Long id,
-            @PathVariable Long productoId,
-            @RequestParam int cantidad
-    ) {
 
-        Carrito carrito = carritoService.modificarCantidad(
-                id,
-                productoId,
-                cantidad
-        );
+    @PutMapping("/modificar")
+    public BaseResponse<Carrito> modificar(
+            @RequestBody AgregarProductoCarritoRequest request,
+            Principal principal) {
 
-        return BaseResponse.ok(carrito, "Cantidad modificada");
+        return BaseResponse.ok(
+                carritoService.modificarCantidad(
+                        principal.getName(),
+                        request.getProductoId(),
+                        request.getCantidad()),
+                "Cantidad modificada");
     }
+
+
+
 }

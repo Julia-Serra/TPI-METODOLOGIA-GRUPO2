@@ -4,9 +4,11 @@ import com.metodologia.bodyPaint.config.exceptions.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import com.metodologia.bodyPaint.feature.models.Carrito;
+import com.metodologia.bodyPaint.feature.models.Cliente;
 import com.metodologia.bodyPaint.feature.models.ItemCarrito;
 import com.metodologia.bodyPaint.feature.models.Producto;
 import com.metodologia.bodyPaint.feature.repositories.CarritoRepository;
+import com.metodologia.bodyPaint.feature.repositories.ClienteRepository;
 import com.metodologia.bodyPaint.feature.repositories.ProductoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,47 +19,54 @@ public class CarritoService {
 
     private final CarritoRepository carritoRepository;
     private final ProductoRepository productoRepository;
+    private final ClienteRepository clienteRepository; // <-- FALTABA
 
-    public Carrito crear() {
-        return carritoRepository.save(new Carrito());
+    // ================= OBTENER O CREAR CARRITO DEL CLIENTE =================
+    private Carrito obtenerCarritoDelCliente(String email) {
+
+        Cliente cliente = clienteRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("Cliente no encontrado"));
+
+        return carritoRepository.findByCliente(cliente)
+                .orElseGet(() -> {
+                    Carrito nuevo = new Carrito();
+                    nuevo.setCliente(cliente);
+                    return carritoRepository.save(nuevo);
+                });
     }
 
-    public Carrito agregarProducto(Long carritoId, Long productoId, int cantidad) {
-        if(cantidad <= 0) {
-            throw new BadRequestException(
-                    "La cantidad debe ser mayor a 0"
-            );
+    // ================= AGREGAR PRODUCTO =================
+    public Carrito agregarProducto(String email, Long productoId, int cantidad) {
+
+        if (cantidad <= 0) {
+            throw new BadRequestException("La cantidad debe ser mayor a 0");
         }
 
-        Carrito carrito = carritoRepository.findById(carritoId).orElseThrow();
+        Carrito carrito = obtenerCarritoDelCliente(email);
 
-        Producto producto = productoRepository.findById(productoId).orElseThrow();
+        Producto producto = productoRepository.findById(productoId)
+                .orElseThrow();
 
-        // validar stock
-        if(producto.getStock() < cantidad) {
-            throw new RuntimeException("Stock insuficiente");
+        if (producto.getStock() < cantidad) {
+            throw new BadRequestException("Stock insuficiente");
         }
 
-        // buscar si ya existe el producto en el carrito
         ItemCarrito existente = carrito.getItems()
                 .stream()
                 .filter(i -> i.getProducto().getId().equals(productoId))
                 .findFirst()
                 .orElse(null);
 
-        // si existe, suma cantidad
-        if(existente != null) {
-
+        if (existente != null) {
             int nuevaCantidad = existente.getCantidad() + cantidad;
 
-            if(producto.getStock() < nuevaCantidad) {
-                throw new RuntimeException("Stock insuficiente");
+            if (producto.getStock() < nuevaCantidad) {
+                throw new BadRequestException("Stock insuficiente");
             }
 
             existente.setCantidad(nuevaCantidad);
 
         } else {
-
             ItemCarrito item = ItemCarrito.builder()
                     .producto(producto)
                     .cantidad(cantidad)
@@ -69,40 +78,18 @@ public class CarritoService {
         return carritoRepository.save(carrito);
     }
 
-    public Carrito vaciar(Long carritoId) {
+    // ================= MODIFICAR CANTIDAD =================
+    public Carrito modificarCantidad(String email, Long productoId, int cantidad) {
 
-        Carrito carrito = carritoRepository.findById(carritoId)
-                .orElseThrow(() ->
-                        new BadRequestException("Carrito no encontrado"));
-
-        carrito.getItems().clear();
-
-        return carritoRepository.save(carrito);
-    }
-    public Carrito modificarCantidad(
-            Long carritoId,
-            Long productoId,
-            int cantidad
-    ) {
-
-        if(cantidad <= 0) {
-            throw new BadRequestException(
-                    "La cantidad debe ser mayor a 0"
-            );
-        }
-
-        Carrito carrito = carritoRepository.findById(carritoId)
-                .orElseThrow(() ->
-                        new BadRequestException("Carrito no encontrado"));
+        Carrito carrito = obtenerCarritoDelCliente(email);
 
         ItemCarrito item = carrito.getItems()
                 .stream()
                 .filter(i -> i.getProducto().getId().equals(productoId))
                 .findFirst()
-                .orElseThrow(() ->
-                        new BadRequestException("Producto no encontrado en carrito"));
+                .orElseThrow(() -> new BadRequestException("Producto no encontrado"));
 
-        if(item.getProducto().getStock() < cantidad) {
+        if (item.getProducto().getStock() < cantidad) {
             throw new BadRequestException("Stock insuficiente");
         }
 
@@ -110,22 +97,33 @@ public class CarritoService {
 
         return carritoRepository.save(carrito);
     }
-    public Carrito quitarProducto(Long carritoId, Long productoId) {
 
-        Carrito carrito = carritoRepository.findById(carritoId)
-                .orElseThrow(() ->
-                        new BadRequestException("Carrito no encontrado"));
+    // ================= QUITAR PRODUCTO =================
+    public Carrito quitarProducto(String email, Long productoId) {
 
-        boolean eliminado = carrito.getItems().removeIf(
-                i -> i.getProducto().getId().equals(productoId)
-        );
+        Carrito carrito = obtenerCarritoDelCliente(email);
 
-        if(!eliminado) {
-            throw new BadRequestException(
-                    "Producto no encontrado en carrito"
-            );
+        boolean eliminado = carrito.getItems()
+                .removeIf(i -> i.getProducto().getId().equals(productoId));
+
+        if (!eliminado) {
+            throw new BadRequestException("Producto no encontrado en carrito");
         }
 
         return carritoRepository.save(carrito);
+    }
+
+    // ================= VACIAR =================
+    public Carrito vaciar(String email) {
+
+        Carrito carrito = obtenerCarritoDelCliente(email);
+        carrito.getItems().clear();
+
+        return carritoRepository.save(carrito);
+    }
+
+    // ================= OBTENER =================
+    public Carrito obtener(String email) {
+        return obtenerCarritoDelCliente(email);
     }
 }

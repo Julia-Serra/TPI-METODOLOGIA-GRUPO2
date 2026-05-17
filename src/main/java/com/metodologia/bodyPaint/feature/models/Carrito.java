@@ -18,14 +18,17 @@ public class Carrito {
     @GeneratedValue
     private Long id;
 
+    @OneToOne
+    private Cliente cliente;
+
     @OneToMany(
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @JoinColumn(name = "carrito_id")
     private List<ItemCarrito> items = new ArrayList<>();
 
     public double getTotal() {
-
         return items.stream()
                 .mapToDouble(i ->
                         i.getProducto().getPrecio() * i.getCantidad()

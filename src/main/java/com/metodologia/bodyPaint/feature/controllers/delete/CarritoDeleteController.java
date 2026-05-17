@@ -1,5 +1,6 @@
 package com.metodologia.bodyPaint.feature.controllers.delete;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,20 +19,24 @@ public class CarritoDeleteController {
 
     private final CarritoService carritoService;
 
-    @DeleteMapping("/{id}/vaciar")
-    public BaseResponse<Carrito> vaciar(@PathVariable Long id) {
+    @DeleteMapping("/vaciar")
+    public BaseResponse<Carrito> vaciar(Authentication auth) {
 
-        Carrito carrito = carritoService.vaciar(id);
+        Carrito carrito = carritoService.vaciar(auth.getName());
 
         return BaseResponse.ok(carrito, "Carrito vaciado");
     }
-    @DeleteMapping("/{id}/quitar/{productoId}")
+
+    @DeleteMapping("/quitar/{productoId}")
     public BaseResponse<Carrito> quitar(
-            @PathVariable Long id,
-            @PathVariable Long productoId
+            @PathVariable Long productoId,
+            Authentication auth
     ) {
 
-        Carrito carrito = carritoService.quitarProducto(id, productoId);
+        Carrito carrito = carritoService.quitarProducto(
+                auth.getName(),
+                productoId
+        );
 
         return BaseResponse.ok(carrito, "Producto eliminado del carrito");
     }

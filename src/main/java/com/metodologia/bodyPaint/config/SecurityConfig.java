@@ -19,46 +19,26 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
 
-                
-                .requestMatchers(
-                        "/",
-                        "/index.html",
-                        "/registro.html",
-                        "/admin.html",
-                        "/producto.html",
-                        "/**/*.css",
-                        "/**/*.js",
-                        "/uploads/**"
-                ).permitAll()
+                    
+                        .requestMatchers(
+                                "/",
+                                "/pages/**",
+                                "/js/**",
+                                "/css/**",
+                                "/images/**",
+                                "/favicon.ico")
+                        .permitAll()
 
-                
-                .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
+                      
+                        .requestMatchers("/clientes/me").permitAll()
 
-                
-                .requestMatchers("/carritos/**").hasRole("CLIENTE")
-                .requestMatchers(HttpMethod.POST, "/pedidos").hasRole("CLIENTE")
-                .requestMatchers(HttpMethod.GET, "/pedidos/mis-pedidos").hasRole("CLIENTE")
-
-                
-                .requestMatchers(HttpMethod.POST, "/productos").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/productos/*/imagen").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/productos/**").hasRole("ADMIN")
-
-               
-                .requestMatchers(HttpMethod.PUT, "/pedidos/*/cancelar").hasRole("VENDEDOR")
-                .requestMatchers(HttpMethod.PUT, "/pedidos/*/estado").hasRole("VENDEDOR")
-                .requestMatchers(HttpMethod.GET, "/pedidos/**").hasAnyRole("VENDEDOR", "ADMIN")
-
-                
-                .anyRequest().authenticated()
-            )
-            .httpBasic(Customizer.withDefaults());
+                      
+                        .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
