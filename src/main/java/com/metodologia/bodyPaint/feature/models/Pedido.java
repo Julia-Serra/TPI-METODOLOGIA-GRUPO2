@@ -1,6 +1,8 @@
 package com.metodologia.bodyPaint.feature.models;
 
 import com.metodologia.bodyPaint.config.exceptions.BadRequestException;
+
+import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
@@ -49,7 +51,6 @@ public class Pedido {
 
     private String motivoCancelacion;
 
-    
     public void cancelar(String motivo) {
 
         if (motivo == null || motivo.isBlank()) {
@@ -63,5 +64,12 @@ public class Pedido {
 
         this.estado = EstadoPedido.CANCELADO;
         this.motivoCancelacion = motivo;
+    }
+
+    public void actualizarEstado(EstadoPedido nuevoEstado) {
+        if (this.estado == EstadoPedido.CANCELADO) {
+            throw new BadRequestException("No se puede modificar el estado de un pedido CANCELADO");
+        }
+        this.estado = nuevoEstado;
     }
 }

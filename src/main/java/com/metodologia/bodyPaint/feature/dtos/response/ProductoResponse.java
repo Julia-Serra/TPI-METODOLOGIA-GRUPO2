@@ -15,4 +15,6 @@ public class ProductoResponse {
     private double precio;
     private int stock;
     private String imagen;
+    private Integer stockMinimo;
+    private boolean alertaStockMinimo; // True si el stock actual es menor o igual al mínimo
 }

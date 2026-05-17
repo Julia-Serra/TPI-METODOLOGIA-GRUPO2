@@ -17,14 +17,20 @@ public class ProductoMapper {
                 .imagen(request.getImagen())
                 .build();
     }
+
     public static ProductoResponse toResponse(Producto producto){
-    return ProductoResponse.builder()
-            .id(producto.getId())
-            .nombre(producto.getNombre())
-            .marca(producto.getMarca())
-            .precio(producto.getPrecio())
-            .stock(producto.getStock())
-            .imagen(producto.getImagen())
-            .build();
-}
+        // Calculamos la alerta: si tiene stock mínimo configurado y el stock actual es menor o igual a ese límite
+        boolean mostrarAlerta = producto.getStockMinimo() != null && producto.getStock() <= producto.getStockMinimo();
+
+        return ProductoResponse.builder()
+                .id(producto.getId())
+                .nombre(producto.getNombre())
+                .marca(producto.getMarca())
+                .precio(producto.getPrecio())
+                .stock(producto.getStock())
+                .imagen(producto.getImagen())
+                .stockMinimo(producto.getStockMinimo()) // nuevo campo
+                .alertaStockMinimo(mostrarAlerta)       // boolean para advertencia
+                .build();
+    }
 }

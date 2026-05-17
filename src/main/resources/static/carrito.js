@@ -1,18 +1,15 @@
-
 const API = "http://localhost:8080";
 let clienteActual = null;
 
-let carritoId =
-    localStorage.getItem("carritoId");
+let carritoId = localStorage.getItem("carritoId");
 
 async function iniciar(){
 
     if(!carritoId){
 
-        const res =
-            await fetch(`${API}/carritos`,{
-                method:"POST"
-            });
+        const res = await fetch(`${API}/carritos`,{
+            method:"POST"
+        });
 
         const data = await res.json();
 
@@ -29,10 +26,9 @@ async function iniciar(){
 
 async function cargar(){
 
-    const res =
-        await fetch(
-            `${API}/carritos/${carritoId}`
-        );
+    const res = await fetch(
+        `${API}/carritos/${carritoId}`
+    );
 
     const data = await res.json();
     if(!data.data){
@@ -46,8 +42,7 @@ async function cargar(){
         return;
     }
 
-    const div =
-        document.getElementById("items");
+    const div = document.getElementById("items");
 
     div.innerHTML = "";
 
@@ -66,12 +61,9 @@ async function cargar(){
 
     carrito.items.forEach(item => {
 
-        const subtotal =
-            item.producto.precio *
-            item.cantidad;
+        const subtotal = item.producto.precio * item.cantidad;
 
         div.innerHTML += `
-
             <div class="item">
 
                 <h3>${item.producto.nombre}</h3>
@@ -110,30 +102,40 @@ async function cargar(){
     });
 
     document.getElementById("total")
-        .innerHTML =
-        `Total: $${carrito.total}`;
+        .innerHTML = `Total: $${carrito.total}`;
 }
 
 async function modificar(productoId,cantidad){
 
     if(cantidad <= 0){
-
         eliminar(productoId);
-
         return;
     }
 
-    const res =
-        await fetch(
-            `${API}/carritos/${carritoId}/modificar/${productoId}?cantidad=${cantidad}`,
-            {
-                method:"PUT"
-            }
-        );
+    const res = await fetch(
+        `${API}/carritos/${carritoId}/modificar/${productoId}?cantidad=${cantidad}`,
+        {
+            method:"PUT"
+        }
+    );
 
     if(!res.ok){
+        // Intentamos leer el error del backend, si no viene usamos el mensaje por defecto
+        let msgError = "Stock insuficiente";
+        try {
+            const dataError = await res.json();
+            if(dataError && dataError.message) msgError = dataError.message;
+        } catch(e) {}
 
-        alert("Stock insuficiente");
+        // Alerta estética con SweetAlert2 para el límite de stock
+        Swal.fire({
+            title: '¡Atención!',
+            text: msgError,
+            icon: 'warning',
+            confirmButtonColor: '#bc2e7e',
+            background: '#231932',
+            color: '#ffffff'
+        });
 
         return;
     }
@@ -161,6 +163,17 @@ async function vaciar(){
             method:"DELETE"
         }
     );
+
+    // Alerta rápida para avisar que se vació correctamente
+    Swal.fire({
+        title: 'Carrito vacío',
+        text: 'Se quitaron todos los productos',
+        icon: 'success',
+        confirmButtonColor: '#bc2e7e',
+        background: '#231932',
+        color: '#ffffff',
+        timer: 1500
+    });
 
     cargar();
 }
