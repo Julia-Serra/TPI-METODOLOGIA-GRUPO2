@@ -1,0 +1,33 @@
+### Crear carrito
+POST http://localhost:8080/carritos
+###
+
+### Agregar producto al carrito
+POST http://localhost:8080/carritos/1/producto
+Content-Type: application/json
+
+{
+  "productoId": 1,
+  "cantidad": 2
+}
+###
+
+### Ver carrito
+GET http://localhost:8080/carritos
+
+###
+
+### Modificar cantidad
+PUT http://localhost:8080/carritos/1/producto/1?cantidad=5
+
+###
+
+### Quitar producto
+DELETE http://localhost:8080/carritos/1/producto/1
+
+###
+
+### Vaciar carrito
+DELETE http://localhost:8080/carritos/1
+
+###

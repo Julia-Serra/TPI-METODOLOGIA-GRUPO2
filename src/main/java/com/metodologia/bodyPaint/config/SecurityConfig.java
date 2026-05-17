@@ -46,6 +46,10 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/productos/*/imagen").permitAll()
 
+                        //nuevos
+                        .requestMatchers("/carritos/**").permitAll()
+                        .requestMatchers("/pedidos/**").permitAll()
+
                         // RESTO PROTEGIDO
                         .anyRequest().authenticated()
                 )
@@ -72,4 +76,5 @@ public class SecurityConfig {
                     .build();
         };
     }
+
 }

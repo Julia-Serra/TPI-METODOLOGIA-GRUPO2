@@ -52,6 +52,43 @@
     </div>
 
 </div>
+<div>
+    <h2>Confirmar Pedido</h2>
+
+    <br><br>
+
+    <h3>Datos del pedido</h3>
+    <input
+            type="email"
+            id="emailCliente"
+            placeholder="Ingrese su email"
+    />
+
+    <button onclick="buscarCliente()">
+        Buscar cliente
+    </button>
+
+    <br><br>
+
+    <label>Domicilio:</label>
+    <select id="direccionSelect">
+        <option value="">Seleccione un domicilio</option>
+    </select>
+
+    <br><br>
+
+    <label>Forma de pago:</label>
+    <select id="formaPago">
+        <option value="">Seleccione</option>
+        <option value="EFECTIVO">Efectivo contra entrega</option>
+    </select>
+
+    <br><br>
+
+    <button onclick="confirmarPedido()">
+        Confirmar Pedido
+    </button>
+</div>
 
 <script src="carrito.js"></script>
 

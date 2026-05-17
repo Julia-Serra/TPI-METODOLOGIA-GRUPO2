@@ -1,5 +1,6 @@
 
 const API = "http://localhost:8080";
+let clienteActual = null;
 
 let carritoId =
     localStorage.getItem("carritoId");
@@ -22,7 +23,7 @@ async function iniciar(){
             carritoId
         );
     }
-
+    await cargarCliente();
     cargar();
 }
 
@@ -34,8 +35,16 @@ async function cargar(){
         );
 
     const data = await res.json();
-
+    if(!data.data){
+        localStorage.removeItem("carritoId");
+        location.reload();
+        return;
+    } //RECIEN
     const carrito = data.data;
+    if(!carrito){
+        alert("Error cargando carrito");
+        return;
+    }
 
     const div =
         document.getElementById("items");
@@ -157,3 +166,128 @@ async function vaciar(){
 }
 
 iniciar();
+async function cargarCliente() {
+
+    const response = await fetch(
+        `${API}/clientes/me`,
+        {
+            headers: {
+                "Authorization":
+                    "Basic " + btoa("cliente@bodypaint.com:1234")
+            }
+        }
+    );
+
+    if(!response.ok){
+        alert("No se pudo cargar el cliente");
+        return;
+    }
+
+    clienteActual = await response.json();
+
+    cargarDirecciones(clienteActual.direcciones);
+}
+async function confirmarPedido() {
+    if(clienteActual == null){
+        alert("Cliente no cargado");
+        return;
+    }
+
+    const direccionIndex =
+        document.getElementById("direccionSelect").value;
+
+    const formaPago =
+        document.getElementById("formaPago").value;
+
+    if(direccionIndex === ""){
+        alert("Seleccione un domicilio");
+        return;
+    }
+
+    if(formaPago === ""){
+        alert("Seleccione forma de pago");
+        return;
+    }
+
+    const direccion =
+        clienteActual.direcciones[direccionIndex];
+
+    const body = {
+        carritoId: carritoId,
+        emailCliente: clienteActual.email,
+        domicilioEnvio: direccion,
+        formaPago: formaPago
+    };
+
+    const response = await fetch(
+        `${API}/pedidos/confirmar`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization":
+                    "Basic " + btoa("cliente@bodypaint.com:1234")
+            },
+            body: JSON.stringify(body)
+        }
+    );
+
+    if(response.ok){
+        alert("Pedido confirmado");
+    } else {
+
+        const error = await response.text();
+
+        alert(error);
+    }
+}
+
+async function buscarCliente() {
+
+    const email =
+        document.getElementById(
+            "emailCliente"
+        ).value;
+
+    const response =
+        await fetch(
+            `${API}/clientes/email/${email}`
+        );
+
+    if(!response.ok){
+
+        alert("Cliente no encontrado");
+
+        return;
+    }
+
+    const data = await response.json();
+
+    clienteActual = data.data;
+
+    cargarDirecciones(
+        clienteActual.direcciones
+    );
+}
+
+function cargarDirecciones(direcciones){
+
+    const select = document.getElementById("direccionSelect");
+
+    select.innerHTML =
+        '<option value="">Seleccione un domicilio</option>';
+
+    direcciones.forEach((direccion, index) => {
+
+        const option = document.createElement("option");
+
+        option.value = index;
+
+        option.textContent =
+            direccion.calle + " " +
+            direccion.numero + " - " +
+            direccion.localidad;
+
+        select.appendChild(option);
+    });
+}

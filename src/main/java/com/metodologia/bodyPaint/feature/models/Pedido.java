@@ -1,7 +1,10 @@
 package com.metodologia.bodyPaint.feature.models;
 
 import com.metodologia.bodyPaint.config.exceptions.BadRequestException;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,6 +33,11 @@ public class Pedido {
 
     @ManyToOne
     private Cliente cliente;
+
+    @OneToMany(
+            cascade = CascadeType.ALL
+    )
+    private List <ItemCarrito> items = new ArrayList<>();
 
     @Embedded
     private Direccion domicilioEnvio;
