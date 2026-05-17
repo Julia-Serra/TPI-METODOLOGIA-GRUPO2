@@ -467,3 +467,21 @@ form button{
 .hidden{
     display:none;
 }
+
+.producto-alerta-stock {
+    border: 2px solid #ff9800 !important;
+    background-color: #fffde7;
+}
+
+
+.badge-alerta {
+    background-color: #ffe0b2;
+    color: #e65100;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 5px;
+    border: 1px solid #ffb74d;
+}
