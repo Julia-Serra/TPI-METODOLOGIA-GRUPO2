@@ -87,7 +87,7 @@ public class PedidoConfirmService implements IPedidoConfirmService {
                 .items(new java.util.ArrayList<>(carrito.getItems()))
                 .domicilioEnvio(request.getDomicilioEnvio())
                 .formaPago(request.getFormaPago())
-                .estado(EstadoPedido.CONFIRMADO)
+                .estado(EstadoPedido.PENDIENTE_PREPARACION)
                 .build();
 
         return pedidoRepository.save(pedido);

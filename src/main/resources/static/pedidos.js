@@ -85,7 +85,7 @@ async function cancelarPedido(id) {
         confirmButtonColor: '#bc2e7e'
     });
 
-    if (!motivo) {
+    if (!motivo || !motivo.trim()) {
         Swal.fire({
             icon: 'error',
             text: 'Debes ingresar un motivo'
@@ -103,8 +103,15 @@ async function cancelarPedido(id) {
         });
 
         if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.message || "Error al cancelar");
+
+            let message = "Error al cancelar";
+
+            try {
+                const err = await res.json();
+                message = err.message || message;
+            } catch (e) { }
+
+            throw new Error(message);
         }
 
         Swal.fire({
@@ -121,5 +128,4 @@ async function cancelarPedido(id) {
         });
     }
 }
-
 cargarPedidos();
