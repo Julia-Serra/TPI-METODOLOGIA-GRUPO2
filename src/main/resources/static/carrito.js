@@ -43,6 +43,11 @@ async function cargar() {
 
         const carrito = data.data;
 
+        if (!carrito || !carrito.items) {
+            document.getElementById("items").innerHTML = "Carrito inválido";
+            return;
+        }
+
         const div = document.getElementById("items");
 
         if (!carrito || !carrito.items) {
