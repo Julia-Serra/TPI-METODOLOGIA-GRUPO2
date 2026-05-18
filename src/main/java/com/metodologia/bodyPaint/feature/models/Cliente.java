@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.List;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;
@@ -34,8 +36,8 @@ public class Cliente {
     private Rol rol;
     @ElementCollection
     @CollectionTable(
-            name ="cliente_direcciones",
+            name = "cliente_direcciones",
             joinColumns = @JoinColumn(name = "cliente_id")
     )
-    private List<Direccion> direcciones;
+    private List<Direccion> direcciones = new ArrayList<>();
 }

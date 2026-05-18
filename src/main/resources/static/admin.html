@@ -126,6 +126,17 @@
         
         <p id="msgBaja"></p>
 
+        <h2>Configurar stock mínimo</h2>
+
+        <input id="productoIdStock" type="number" placeholder="ID producto">
+        <input id="stockMinimo" type="number" placeholder="Stock mínimo">
+
+        <button onclick="setStockMinimo()">
+            Guardar stock mínimo
+        </button>
+
+        <p id="msgStock"></p>
+
     </div>
 
 </div>
@@ -382,7 +393,33 @@
             }
         }
     }
+    async function setStockMinimo(){
 
+        const id = document.getElementById("productoIdStock").value;
+        const stockMin = document.getElementById("stockMinimo").value;
+
+        if(!id || stockMin === ""){
+            Swal.fire("Error","Datos incompletos","error");
+            return;
+        }
+
+        const res = await fetch(`${API}/api/productos/${id}/stock-minimo`, {
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify({
+                stockMinimo: parseInt(stockMin)
+            })
+        });
+
+        if(res.ok){
+            Swal.fire("OK","Stock mínimo actualizado","success");
+        }else{
+            Swal.fire("Error","No se pudo actualizar","error");
+        }
+    }
 </script>
 
 </body>

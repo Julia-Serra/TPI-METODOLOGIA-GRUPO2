@@ -1,9 +1,6 @@
 package com.metodologia.bodyPaint.feature.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -13,11 +10,13 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ItemCarrito {
+
     @Id
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "producto_id")
     private Producto producto;
 
     private int cantidad;

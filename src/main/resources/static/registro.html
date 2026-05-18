@@ -48,6 +48,21 @@
         </button>
 
     </form>
+    <hr>
+
+    <h3>Agregar otro domicilio (opcional)</h3>
+
+    <input id="emailBuscar" placeholder="Email del cliente">
+
+    <input id="pais2" placeholder="País">
+    <input id="provincia2" placeholder="Provincia">
+    <input id="localidad2" placeholder="Localidad">
+    <input id="calle2" placeholder="Calle">
+    <input id="numero2" placeholder="Número">
+
+    <button type="button" onclick="agregarDomicilio()">
+        Agregar domicilio
+    </button>
 
 </div>
 
@@ -58,123 +73,119 @@
 
         e.preventDefault();
 
-        const soloLetras =
-            /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
+        const nombre = document.getElementById("nombre").value.trim();
+        const apellido = document.getElementById("apellido").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const pais = document.getElementById("pais").value.trim();
+        const provincia = document.getElementById("provincia").value.trim();
+        const localidad = document.getElementById("localidad").value.trim();
+        const calle = document.getElementById("calle").value.trim();
+        const numero = document.getElementById("numero").value.trim();
 
-        const emailRegex =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if(!soloLetras.test(nombre.value)){
+        if(!soloLetras.test(nombre)) return mostrarError("Nombre inválido");
+        if(!soloLetras.test(apellido)) return mostrarError("Apellido inválido");
+        if(!soloLetras.test(pais)) return mostrarError("País inválido");
+        if(!soloLetras.test(provincia)) return mostrarError("Provincia inválida");
+        if(!soloLetras.test(localidad)) return mostrarError("Localidad inválida");
 
-            mostrarError("Nombre inválido");
-            return;
-        }
-
-        if(!soloLetras.test(apellido.value)){
-
-            mostrarError("Apellido inválido");
-            return;
-        }
-
-        if(!soloLetras.test(pais.value)){
-
-            mostrarError("País inválido");
-            return;
-        }
-
-        if(!soloLetras.test(provincia.value)){
-
-            mostrarError("Provincia inválida");
-            return;
-        }
-
-        if(!soloLetras.test(localidad.value)){
-
-            mostrarError("Localidad inválida");
-            return;
-        }
-
-        if(!emailRegex.test(email.value)){
-
-            mostrarError("Email inválido");
-            return;
-        }
+        if(!emailRegex.test(email)) return mostrarError("Email inválido");
 
         const cliente = {
-
-            nombre: nombre.value,
-
-            apellido: apellido.value,
-
-            email: email.value,
-
-            pais: pais.value,
-
-            provincia: provincia.value,
-
-            localidad: localidad.value,
-
-            calle: calle.value,
-
-            numero: numero.value
+            nombre,
+            apellido,
+            email,
+            pais,
+            provincia,
+            localidad,
+            calle,
+            numero
         };
 
         try{
 
-            const res =
-                await fetch(
-                    "http://localhost:8080/clientes",
-                    {
-                        method:"POST",
-                        headers:{
-                            "Content-Type":"application/json"
-                        },
-                        body:JSON.stringify(cliente)
-                    }
-                );
+            const res = await fetch("http://localhost:8080/clientes", {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(cliente)
+            });
 
             const data = await res.json();
 
             if(!res.ok){
-
-                mostrarError(
-                    data.errors
-                        ? data.errors.join(", ")
-                        : data.message
-                );
-
-                return;
+                return mostrarError(data.message || "Error");
             }
 
             Swal.fire({
                 title:'Registro exitoso',
-                text:'Cliente registrado correctamente',
-                icon:'success',
-                confirmButtonColor:'#bc2e7e',
-                background:'#231932',
-                color:'#ffffff'
+                icon:'success'
             });
 
-            formCliente.reset();
+            document.getElementById("formCliente").reset();
 
-        }catch(err){
-
+        }catch(e){
             mostrarError("Error de conexión");
         }
     });
 
     function mostrarError(msg){
-
         Swal.fire({
-            title:'Error',
-            text:msg,
             icon:'error',
-            confirmButtonColor:'#bc2e7e',
-            background:'#231932',
-            color:'#ffffff'
+            text:msg
         });
     }
+    async function agregarDomicilio(){
 
+        const email = document.getElementById("emailBuscar").value.trim();
+        const safeEmail = encodeURIComponent(email);
+
+        const domicilio = {
+            pais: document.getElementById("pais2").value.trim(),
+            provincia: document.getElementById("provincia2").value.trim(),
+            localidad: document.getElementById("localidad2").value.trim(),
+            calle: document.getElementById("calle2").value.trim(),
+            numero: document.getElementById("numero2").value.trim()
+        };
+
+        if(!email){
+            return mostrarError("Ingresá el email");
+        }
+
+        if(Object.values(domicilio).some(v => !v)){
+            return mostrarError("Faltan datos del domicilio");
+        }
+
+        try{
+
+            const res = await fetch(
+                `http://localhost:8080/clientes/${safeEmail}/domicilios`,
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body: JSON.stringify(domicilio)
+                }
+            );
+
+            if(!res.ok){
+                const err = await res.text();
+                return mostrarError(err);
+            }
+
+            Swal.fire({
+                icon:'success',
+                text:'Domicilio agregado'
+            });
+
+        }catch(e){
+            mostrarError("Error de conexión");
+        }
+}
 </script>
 
 </body>

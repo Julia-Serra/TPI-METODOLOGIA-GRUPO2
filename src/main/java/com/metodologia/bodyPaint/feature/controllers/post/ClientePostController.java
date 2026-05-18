@@ -29,7 +29,7 @@ public class ClientePostController {
 
         return BaseResponse.ok(null,"Cliente creado");
     }
-    @PostMapping("/{email}/direcciones")
+    @PostMapping("/{email}/domicilios")
     public BaseResponse<Void> agregarDireccion(
             @PathVariable String email,
             @Valid @RequestBody DireccionRequest request) {
