@@ -10,11 +10,7 @@ async function cargarPedidos() {
         grid.innerHTML = "";
 
         if (!data.data || data.data.length === 0) {
-            grid.innerHTML = `
-                <p class="empty">
-                    No hay pedidos pendientes
-                </p>
-            `;
+            grid.innerHTML = `<p class="empty">No hay pedidos pendientes</p>`;
             return;
         }
 
@@ -35,21 +31,11 @@ async function cargarPedidos() {
 
                     <h3>Pedido #${pedido.id}</h3>
 
-                    <p>
-                        Cliente: 
-                        ${pedido.cliente.nombre} 
-                        ${pedido.cliente.apellido}
-                    </p>
+                    <p>Cliente: ${pedido.cliente.nombre} ${pedido.cliente.apellido}</p>
 
-                    <p>
-                        Email: 
-                        ${pedido.cliente.email}
-                    </p>
+                    <p>Email: ${pedido.cliente.email}</p>
 
-                    <p>
-                        Forma de pago: 
-                        ${pedido.formaPago}
-                    </p>
+                    <p>Forma de pago: ${pedido.formaPago}</p>
 
                     <p>
                         Domicilio: 
@@ -58,8 +44,11 @@ async function cargarPedidos() {
                         ${pedido.domicilioEnvio.localidad}
                     </p>
 
-                    <h4>Productos</h4>
+                    <button onclick="cancelarPedido(${pedido.id})" class="btn-cancelar">
+                        Cancelar pedido
+                    </button>
 
+                    <h4>Productos</h4>
                     <ul>
                         ${itemsHtml}
                     </ul>
@@ -70,8 +59,7 @@ async function cargarPedidos() {
 
     } catch (error) {
         console.error(error);
-        
-        // Alerta estética si se cae el servidor o falla la conexión
+
         Swal.fire({
             title: 'Error',
             text: 'No se pudieron cargar los pedidos pendientes',
@@ -81,11 +69,56 @@ async function cargarPedidos() {
             color: '#ffffff'
         });
 
-        document.getElementById("pedidosGrid").innerHTML = `
-            <p class="empty">
-                Error al cargar pedidos
-            </p>
-        `;
+        document.getElementById("pedidosGrid").innerHTML =
+            `<p class="empty">Error al cargar pedidos</p>`;
+    }
+}
+async function cancelarPedido(id) {
+
+    const { value: motivo } = await Swal.fire({
+        title: 'Cancelar pedido',
+        input: 'text',
+        inputLabel: 'Motivo de cancelación',
+        inputPlaceholder: 'Escribí el motivo...',
+        showCancelButton: true,
+        confirmButtonText: 'Cancelar pedido',
+        confirmButtonColor: '#bc2e7e'
+    });
+
+    if (!motivo) {
+        Swal.fire({
+            icon: 'error',
+            text: 'Debes ingresar un motivo'
+        });
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API}/pedidos/${id}/cancelar`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ motivo })
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || "Error al cancelar");
+        }
+
+        Swal.fire({
+            icon: 'success',
+            text: 'Pedido cancelado correctamente'
+        });
+
+        cargarPedidos();
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error.message
+        });
     }
 }
 
