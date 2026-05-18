@@ -1,7 +1,6 @@
 const API = "http://localhost:8080";
 
 async function cargarPedidos() {
-
     try {
         const res = await fetch(`${API}/pedidos/pendientes`);
         const data = await res.json();
@@ -10,11 +9,7 @@ async function cargarPedidos() {
         grid.innerHTML = "";
 
         if (!data.data || data.data.length === 0) {
-            grid.innerHTML = `
-                <p class="empty">
-                    No hay pedidos pendientes
-                </p>
-            `;
+            grid.innerHTML = `<p class="empty">No hay pedidos pendientes</p>`;
             return;
         }
 
@@ -32,50 +27,50 @@ async function cargarPedidos() {
 
             grid.innerHTML += `
                 <div class="producto-card">
-            
+
                     <h3>Pedido #${pedido.id}</h3>
-            
+
                     <p>Cliente: ${pedido.cliente.nombre} ${pedido.cliente.apellido}</p>
-            
+
                     <p>Email: ${pedido.cliente.email}</p>
-            
+
                     <p>Forma de pago: ${pedido.formaPago}</p>
-            
+
                     <p>Estado actual: ${pedido.estado}</p>
-            
+
                     <p>
                         Domicilio:
                         ${pedido.domicilioEnvio.calle}
                         ${pedido.domicilioEnvio.numero},
                         ${pedido.domicilioEnvio.localidad}
                     </p>
-            
+
+                    <button onclick="cancelarPedido(${pedido.id})" class="btn-cancelar">
+                        Cancelar pedido
+                    </button>
+
                     <h4>Productos</h4>
-            
                     <ul>
                         ${itemsHtml}
                     </ul>
-            
+
                     <select id="estado-${pedido.id}">
-                        <option value="PENDIENTE_PREPARACION">PENDIENTE PREPARACION</option>
-                        <option value="CONFIRMADO">CONFIRMADO</option>
                         <option value="LISTO">LISTO</option>
-                        <option value="ENTREGADO_POR_CORRERO">ENTREGADO POR CORREO</option>
-                        <option value="CANCELADO">CANCELADO</option>
+                        <option value="RETIRADO_POR_CORREO">RETIRADO POR CORREO</option>
+                        <option value="ENTREGADO">ENTREGADO</option>
                     </select>
-            
+
                     <button onclick="actualizarEstado(${pedido.id})">
                         Actualizar
                     </button>
-            
+
                 </div>
             `;
         });
 
     } catch (error) {
         console.error(error);
-        
-        // Alerta estética si se cae el servidor o falla la conexión
+
         Swal.fire({
             title: 'Error',
             text: 'No se pudieron cargar los pedidos pendientes',
@@ -85,26 +80,15 @@ async function cargarPedidos() {
             color: '#ffffff'
         });
 
-        document.getElementById("pedidosGrid").innerHTML = `
-            <p class="empty">
-                Error al cargar pedidos
-            </p>
-        `;
+        document.getElementById("pedidosGrid").innerHTML =
+            `<p class="empty">Error al cargar pedidos</p>`;
     }
 }
 
 async function actualizarEstado(idPedido) {
-
-    const estado =
-        document.getElementById(`estado-${idPedido}`).value;
-
-    if (!estado) {
-        alert("Seleccione un estado");
-        return;
-    }
+    const estado = document.getElementById(`estado-${idPedido}`).value;
 
     try {
-
         const res = await fetch(
             `${API}/pedidos/${idPedido}/estado?estado=${estado}`,
             {
@@ -118,10 +102,7 @@ async function actualizarEstado(idPedido) {
             Swal.fire({
                 title: 'Error',
                 text: data.message || "No se pudo actualizar",
-                icon: 'error',
-                confirmButtonColor: '#bc2e7e',
-                background: '#231932',
-                color: '#ffffff'
+                icon: 'error'
             });
             return;
         }
@@ -129,23 +110,70 @@ async function actualizarEstado(idPedido) {
         Swal.fire({
             title: 'Actualizado',
             text: 'Estado cambiado correctamente',
-            icon: 'success',
-            confirmButtonColor: '#bc2e7e',
-            background: '#231932',
-            color: '#ffffff'
+            icon: 'success'
         });
 
         cargarPedidos();
 
     } catch (error) {
-
         Swal.fire({
             title: 'Error',
             text: 'Error de conexión',
+            icon: 'error'
+        });
+    }
+}
+
+async function cancelarPedido(id) {
+    const { value: motivo } = await Swal.fire({
+        title: 'Cancelar pedido',
+        input: 'text',
+        inputLabel: 'Motivo de cancelación',
+        inputPlaceholder: 'Escribí el motivo...',
+        showCancelButton: true,
+        confirmButtonText: 'Cancelar pedido',
+        confirmButtonColor: '#bc2e7e'
+    });
+
+    if (!motivo || !motivo.trim()) {
+        Swal.fire({
             icon: 'error',
-            confirmButtonColor: '#bc2e7e',
-            background: '#231932',
-            color: '#ffffff'
+            text: 'Debes ingresar un motivo'
+        });
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API}/pedidos/${id}/cancelar`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ motivo })
+        });
+
+        if (!res.ok) {
+            let message = "Error al cancelar";
+
+            try {
+                const err = await res.json();
+                message = err.message || message;
+            } catch (e) {}
+
+            throw new Error(message);
+        }
+
+        Swal.fire({
+            icon: 'success',
+            text: 'Pedido cancelado correctamente'
+        });
+
+        cargarPedidos();
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error.message
         });
     }
 }

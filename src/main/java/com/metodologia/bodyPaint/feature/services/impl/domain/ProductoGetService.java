@@ -9,7 +9,6 @@ import com.metodologia.bodyPaint.feature.models.Producto;
 import com.metodologia.bodyPaint.feature.repositories.ProductoRepository;
 import com.metodologia.bodyPaint.feature.services.interfaces.domain.IProductoGetService;
 
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,6 +20,7 @@ public class ProductoGetService implements IProductoGetService {
     @Override
     @Transactional(readOnly = true)
     public List<Producto> listar() {
-        return productoRepository.findAll();
+        // Cambiamos el findAll() por nuestro filtro de activos
+        return productoRepository.findByActivoTrue();
     }
 }
