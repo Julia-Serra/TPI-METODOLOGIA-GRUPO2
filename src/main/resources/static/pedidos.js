@@ -43,6 +43,12 @@ async function cargarPedidos() {
                         ${pedido.domicilioEnvio.numero}, 
                         ${pedido.domicilioEnvio.localidad}
                     </p>
+                    <select onchange="cambiarEstado(${pedido.id}, this.value)">
+                        <option value="">Cambiar estado</option>
+                        <option value="LISTO">LISTO</option>
+                        <option value="RETIRADO_POR_CORREO">RETIRADO</option>
+                        <option value="ENTREGADO">ENTREGADO</option>
+                    </select>
 
                     <button onclick="cancelarPedido(${pedido.id})" class="btn-cancelar">
                         Cancelar pedido
@@ -126,6 +132,25 @@ async function cancelarPedido(id) {
             icon: 'error',
             text: error.message
         });
+    }
+}
+async function cambiarEstado(id, estado){
+
+    if(!estado) return;
+
+    const res = await fetch(`${API}/pedidos/${id}/estado`,{
+        method:"PUT",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({ estado })
+    });
+
+    if(res.ok){
+        Swal.fire("OK","Estado actualizado","success");
+        cargarPedidos();
+    }else{
+        Swal.fire("Error","No se pudo cambiar estado","error");
     }
 }
 cargarPedidos();

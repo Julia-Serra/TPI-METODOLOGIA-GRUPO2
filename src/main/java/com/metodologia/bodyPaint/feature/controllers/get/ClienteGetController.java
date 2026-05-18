@@ -26,17 +26,13 @@ public class ClienteGetController {
                 .orElseThrow();
     }
     @GetMapping("/email/{email}")
-    public BaseResponse buscarPorEmail(
-            @PathVariable String email
-    ) {
+    public BaseResponse<Cliente> buscarPorEmail(@PathVariable String email) {
 
         Cliente cliente = clienteRepository
                 .findByEmail(email)
                 .orElseThrow(() ->
-                        new BadRequestException(
-                                "Cliente no encontrado"
-                        ));
+                        new BadRequestException("Cliente no encontrado"));
 
-        return BaseResponse.ok(cliente,"Cliente encontrado");
+        return BaseResponse.ok(cliente, "Cliente encontrado");
     }
 }

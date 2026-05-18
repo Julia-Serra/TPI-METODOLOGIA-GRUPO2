@@ -22,6 +22,7 @@ public class Carrito {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @JoinColumn(name = "carrito_id")
     private List<ItemCarrito> items = new ArrayList<>();
 
     public double getTotal() {

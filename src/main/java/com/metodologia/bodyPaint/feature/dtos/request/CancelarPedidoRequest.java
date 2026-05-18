@@ -6,5 +6,14 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class CancelarPedidoRequest {
+
     private String motivo;
+
+    public String getMotivo() {
+        return motivo;
+    }
+
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
+    }
 }
