@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.metodologia.bodyPaint.config.exceptions.CustomException;
 
+import lombok.Builder;
+
 @RestControllerAdvice
+@Builder
 public class GlobalExceptionHandler {
 
     /**
