@@ -1,6 +1,7 @@
 const API = "http://localhost:8080";
 
 async function cargarPedidos() {
+
     try {
         const res = await fetch(`${API}/pedidos/pendientes`);
         const data = await res.json();
@@ -36,12 +37,10 @@ async function cargarPedidos() {
 
                     <p>Forma de pago: ${pedido.formaPago}</p>
 
-                    <p>Estado actual: ${pedido.estado}</p>
-
                     <p>
-                        Domicilio:
-                        ${pedido.domicilioEnvio.calle}
-                        ${pedido.domicilioEnvio.numero},
+                        Domicilio: 
+                        ${pedido.domicilioEnvio.calle} 
+                        ${pedido.domicilioEnvio.numero}, 
                         ${pedido.domicilioEnvio.localidad}
                     </p>
 
@@ -53,16 +52,6 @@ async function cargarPedidos() {
                     <ul>
                         ${itemsHtml}
                     </ul>
-
-                    <select id="estado-${pedido.id}">
-                        <option value="LISTO">LISTO</option>
-                        <option value="RETIRADO_POR_CORREO">RETIRADO POR CORREO</option>
-                        <option value="ENTREGADO">ENTREGADO</option>
-                    </select>
-
-                    <button onclick="actualizarEstado(${pedido.id})">
-                        Actualizar
-                    </button>
 
                 </div>
             `;
@@ -84,47 +73,8 @@ async function cargarPedidos() {
             `<p class="empty">Error al cargar pedidos</p>`;
     }
 }
-
-async function actualizarEstado(idPedido) {
-    const estado = document.getElementById(`estado-${idPedido}`).value;
-
-    try {
-        const res = await fetch(
-            `${API}/pedidos/${idPedido}/estado?estado=${estado}`,
-            {
-                method: "PUT"
-            }
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            Swal.fire({
-                title: 'Error',
-                text: data.message || "No se pudo actualizar",
-                icon: 'error'
-            });
-            return;
-        }
-
-        Swal.fire({
-            title: 'Actualizado',
-            text: 'Estado cambiado correctamente',
-            icon: 'success'
-        });
-
-        cargarPedidos();
-
-    } catch (error) {
-        Swal.fire({
-            title: 'Error',
-            text: 'Error de conexión',
-            icon: 'error'
-        });
-    }
-}
-
 async function cancelarPedido(id) {
+
     const { value: motivo } = await Swal.fire({
         title: 'Cancelar pedido',
         input: 'text',
@@ -153,12 +103,13 @@ async function cancelarPedido(id) {
         });
 
         if (!res.ok) {
+
             let message = "Error al cancelar";
 
             try {
                 const err = await res.json();
                 message = err.message || message;
-            } catch (e) {}
+            } catch (e) { }
 
             throw new Error(message);
         }
@@ -177,5 +128,4 @@ async function cancelarPedido(id) {
         });
     }
 }
-
 cargarPedidos();

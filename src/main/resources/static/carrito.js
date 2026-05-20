@@ -1,271 +1,285 @@
 const API = "http://localhost:8080";
-
 let clienteActual = null;
+
 let carritoId = localStorage.getItem("carritoId");
 
-// ========================
-// INICIALIZAR CARRITO
-// ========================
-async function iniciar() {
-    try {
+async function iniciar(){
 
-        if (!carritoId) {
-            const res = await fetch(`${API}/carritos`, {
-                method: "POST"
-            });
+    if(!carritoId){
 
-            const data = await res.json();
-
-            if (!res.ok || !data.data) {
-                throw new Error("No se pudo crear el carrito");
-            }
-
-            carritoId = data.data.id;
-            localStorage.setItem("carritoId", carritoId);
-        }
-
-        await cargar();
-
-    } catch (e) {
-        console.error(e);
-        Swal.fire("Error", "No se pudo iniciar el carrito", "error");
-    }
-}
-
-// ========================
-// CARGAR CARRITO
-// ========================
-async function cargar() {
-    try {
-
-        const res = await fetch(`${API}/carritos/${carritoId}`);
-        const data = await res.json();
-
-        const carrito = data.data;
-
-        if (!carrito || !carrito.items) {
-            document.getElementById("items").innerHTML = "Carrito inválido";
-            return;
-        }
-
-        const div = document.getElementById("items");
-
-        if (!carrito || !carrito.items) {
-            div.innerHTML = `<p>Carrito inválido</p>`;
-            return;
-        }
-
-        if (carrito.items.length === 0) {
-            div.innerHTML = `<p class="empty">Carrito vacío 🛒</p>`;
-            document.getElementById("total").innerHTML = "Total: $0";
-            return;
-        }
-
-        div.innerHTML = "";
-
-        carrito.items.forEach(item => {
-
-            const subtotal = item.producto.precio * item.cantidad;
-
-            div.innerHTML += `
-                <div class="item">
-                    <h3>${item.producto.nombre}</h3>
-                    <p>Cantidad: ${item.cantidad}</p>
-                    <p>Subtotal: $${subtotal}</p>
-
-                    <div class="acciones">
-                        <button onclick="modificar(${item.producto.id}, ${item.cantidad + 1})">+</button>
-                        <button onclick="modificar(${item.producto.id}, ${item.cantidad - 1})">-</button>
-                        <button onclick="eliminar(${item.producto.id})">Eliminar</button>
-                    </div>
-                </div>
-            `;
+        const res = await fetch(`${API}/carritos`,{
+            method:"POST"
         });
 
-        document.getElementById("total").innerHTML =
-            `Total: $${carrito.total}`;
-
-    } catch (e) {
-        console.error(e);
-        Swal.fire("Error", "No se pudo cargar el carrito", "error");
-    }
-}
-
-// ========================
-// MODIFICAR CANTIDAD
-// ========================
-async function modificar(productoId, cantidad) {
-
-    if (cantidad <= 0) {
-        return eliminar(productoId);
-    }
-
-    try {
-
-        const res = await fetch(
-            `${API}/carritos/${carritoId}/modificar/${productoId}?cantidad=${cantidad}`,
-            { method: "PUT" }
-        );
-
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok) {
-            Swal.fire("Error", data.message || "Stock insuficiente", "warning");
-            return;
-        }
-
-        await cargar();
-
-    } catch (e) {
-        Swal.fire("Error", "Error modificando producto", "error");
-    }
-}
-
-// ========================
-// ELIMINAR PRODUCTO
-// ========================
-async function eliminar(productoId) {
-
-    try {
-
-        await fetch(
-            `${API}/carritos/${carritoId}/quitar/${productoId}`,
-            { method: "DELETE" }
-        );
-
-        await cargar();
-
-    } catch (e) {
-        Swal.fire("Error", "No se pudo eliminar", "error");
-    }
-}
-
-// ========================
-// VACIAR CARRITO
-// ========================
-async function vaciar() {
-
-    try {
-
-        await fetch(
-            `${API}/carritos/${carritoId}/vaciar`,
-            { method: "DELETE" }
-        );
-
-        Swal.fire("OK", "Carrito vacío", "success");
-
-        await cargar();
-
-    } catch (e) {
-        Swal.fire("Error", "No se pudo vaciar carrito", "error");
-    }
-}
-
-// ========================
-// BUSCAR CLIENTE
-// ========================
-async function buscarCliente() {
-
-    const email = document.getElementById("emailCliente").value;
-
-    try {
-
-        const res = await fetch(`${API}/clientes/email/${email}`);
         const data = await res.json();
 
-        if (!res.ok) {
-            Swal.fire("Error", data.message || "Cliente no encontrado", "error");
-            return;
-        }
+        carritoId = data.data.id;
 
-        clienteActual = data.data;
-
-        cargarDirecciones(clienteActual.direcciones || []);
-
-    } catch (e) {
-        Swal.fire("Error", "Error buscando cliente", "error");
+        localStorage.setItem(
+            "carritoId",
+            carritoId
+        );
     }
+    cargar();
 }
 
-// ========================
-// DIRECCIONES
-// ========================
-function cargarDirecciones(direcciones) {
+async function cargar(){
 
-    const select = document.getElementById("direccionSelect");
+    const res = await fetch(
+        `${API}/carritos/${carritoId}`
+    );
 
-    select.innerHTML = '<option value="">Seleccione un domicilio</option>';
+    const data = await res.json();
+    if(!data.data){
+        localStorage.removeItem("carritoId");
+        location.reload();
+        return;
+    } //RECIEN
+    const carrito = data.data;
+    if(!carrito){
+        alert("Error cargando carrito");
+        return;
+    }
 
-    direcciones.forEach((d, i) => {
+    const div = document.getElementById("items");
 
-        const opt = document.createElement("option");
+    div.innerHTML = "";
 
-        opt.value = i;
-        opt.textContent = `${d.calle} ${d.numero} - ${d.localidad}`;
+    if(carrito.items.length === 0){
 
-        select.appendChild(opt);
+        div.innerHTML =
+            `<p class="empty">
+                Tu carrito está vacío 🛒
+            </p>`;
+
+        document.getElementById("total")
+            .innerHTML = "Total: $0";
+
+        return;
+    }
+
+    carrito.items.forEach(item => {
+
+        const subtotal = item.producto.precio * item.cantidad;
+
+        div.innerHTML += `
+            <div class="item">
+
+                <h3>${item.producto.nombre}</h3>
+
+                <p>Cantidad: ${item.cantidad}</p>
+
+                <p>Subtotal: $${subtotal}</p>
+
+                <div class="acciones">
+
+                    <button
+                        class="btn-sumar"
+                        onclick="modificar(${item.producto.id}, ${item.cantidad + 1})"
+                    >
+                        +
+                    </button>
+
+                    <button
+                        class="btn-restar"
+                        onclick="modificar(${item.producto.id}, ${item.cantidad - 1})"
+                    >
+                        -
+                    </button>
+
+                    <button
+                        class="btn-eliminar"
+                        onclick="eliminar(${item.producto.id})"
+                    >
+                        Eliminar
+                    </button>
+
+                </div>
+
+            </div>
+        `;
     });
+
+    document.getElementById("total")
+        .innerHTML = `Total: $${carrito.total}`;
 }
 
-// ========================
-// CONFIRMAR PEDIDO
-// ========================
+async function modificar(productoId,cantidad){
+
+    if(cantidad <= 0){
+        eliminar(productoId);
+        return;
+    }
+
+    const res = await fetch(
+        `${API}/carritos/${carritoId}/modificar/${productoId}?cantidad=${cantidad}`,
+        {
+            method:"PUT"
+        }
+    );
+
+    if(!res.ok){
+        // Intentamos leer el error del backend, si no viene usamos el mensaje por defecto
+        let msgError = "Stock insuficiente";
+        try {
+            const dataError = await res.json();
+            if(dataError && dataError.message) msgError = dataError.message;
+        } catch(e) {}
+
+        // Alerta estética con SweetAlert2 para el límite de stock
+        Swal.fire({
+            title: '¡Atención!',
+            text: msgError,
+            icon: 'warning',
+            confirmButtonColor: '#bc2e7e',
+            background: '#231932',
+            color: '#ffffff'
+        });
+
+        return;
+    }
+
+    cargar();
+}
+
+async function eliminar(productoId){
+
+    await fetch(
+        `${API}/carritos/${carritoId}/quitar/${productoId}`,
+        {
+            method:"DELETE"
+        }
+    );
+
+    cargar();
+}
+
+async function vaciar(){
+
+    await fetch(
+        `${API}/carritos/${carritoId}/vaciar`,
+        {
+            method:"DELETE"
+        }
+    );
+
+    // Alerta rápida para avisar que se vació correctamente
+    Swal.fire({
+        title: 'Carrito vacío',
+        text: 'Se quitaron todos los productos',
+        icon: 'success',
+        confirmButtonColor: '#bc2e7e',
+        background: '#231932',
+        color: '#ffffff',
+        timer: 1500
+    });
+
+    cargar();
+}
+
+iniciar();
+
 async function confirmarPedido() {
-
-    if (!carritoId) {
-        Swal.fire("Error", "No existe carrito", "error");
+    if(clienteActual == null){
+        alert("Cliente no cargado");
         return;
     }
 
-    if (!clienteActual) {
-        Swal.fire("Error", "Cliente no cargado", "error");
+    const direccionIndex =
+        document.getElementById("direccionSelect").value;
+
+    const formaPago =
+        document.getElementById("formaPago").value;
+
+    if(direccionIndex === ""){
+        alert("Seleccione un domicilio");
         return;
     }
 
-    const direccionIndex = document.getElementById("direccionSelect").value;
-    const formaPago = document.getElementById("formaPago").value;
-
-    if (direccionIndex === "" || formaPago === "") {
-        Swal.fire("Error", "Faltan datos del pedido", "error");
+    if(formaPago === ""){
+        alert("Seleccione forma de pago");
         return;
     }
 
-    const direccion = clienteActual.direcciones[direccionIndex];
+    const direccion =
+        clienteActual.direcciones[direccionIndex];
 
     const body = {
-        carritoId: Number(carritoId),
+        carritoId: carritoId,
         emailCliente: clienteActual.email,
         domicilioEnvio: direccion,
         formaPago: formaPago
     };
 
-    try {
-
-        const res = await fetch(`${API}/pedidos/confirmar`, {
+    const response = await fetch(
+        `${API}/pedidos/confirmar`,
+        {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization":
+                    "Basic " + btoa("cliente@bodypaint.com:1234")
             },
             body: JSON.stringify(body)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            Swal.fire("Error", data.message || "No se pudo confirmar", "error");
-            return;
         }
+    );
 
-        localStorage.removeItem("carritoId");
+    if(response.ok){
+        alert("Pedido confirmado");
+    } else {
 
-        Swal.fire("OK", "Pedido confirmado", "success");
+        const error = await response.text();
 
-        location.reload();
-
-    } catch (e) {
-        Swal.fire("Error", "Error al confirmar pedido", "error");
+        alert(error);
     }
 }
 
-// iniciar app
-iniciar();
+async function buscarCliente() {
+
+    const email =
+        document.getElementById(
+            "emailCliente"
+        ).value;
+
+    const response =
+        await fetch(
+            `${API}/clientes/email/${email}`
+        );
+
+    if(!response.ok){
+
+        alert("Cliente no encontrado");
+
+        return;
+    }
+
+    const data = await response.json();
+
+    clienteActual = data.data;
+
+    cargarDirecciones(
+        clienteActual.direcciones
+    );
+}
+
+function cargarDirecciones(direcciones){
+
+    const select = document.getElementById("direccionSelect");
+
+    select.innerHTML =
+        '<option value="">Seleccione un domicilio</option>';
+
+    direcciones.forEach((direccion, index) => {
+
+        const option = document.createElement("option");
+
+        option.value = index;
+
+        option.textContent =
+            direccion.calle + " " +
+            direccion.numero + " - " +
+            direccion.localidad;
+
+        select.appendChild(option);
+    });
+}

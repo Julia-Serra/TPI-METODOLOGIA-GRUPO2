@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Vendedor | BodyPaint</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<div class="navbar"></div>
+
+<div style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+    <h1>📦 Panel del Vendedor</h1>
+    
+    <div style="background-color: #231932; padding: 30px; border-radius: 10px; margin-top: 20px;">
+        
+        <h2>Gestión de Pedidos</h2>
+        
+        <div style="margin: 20px 0;">
+            <h3>Pedidos Pendientes</h3>
+            <div id="pendingOrdersContainer" style="background-color: #2a1f35; padding: 15px; border-radius: 5px;">
+                <p id="loadingMsg">Cargando pedidos...</p>
+            </div>
+        </div>
+
+        <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
+            <h3>Actualizar Estado de Pedido</h3>
+            <input type="number" id="orderId" placeholder="ID del pedido" style="padding: 8px; margin: 5px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
+            <select id="orderStatus" style="padding: 8px; margin: 5px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
+                <option value="">Seleccionar nuevo estado</option>
+                <option value="PREPARANDO">En preparación</option>
+                <option value="LISTO">Listo para envío</option>
+                <option value="ENVIADO">Enviado</option>
+                <option value="ENTREGADO">Entregado</option>
+            </select>
+            <button onclick="updateOrderStatus()" style="padding: 8px 15px; background-color: #bc2e7e; color: white; border: none; border-radius: 5px; cursor: pointer;">Actualizar Estado</button>
+            <p id="statusMessage" style="margin-top: 10px; min-height: 20px;"></p>
+        </div>
+
+        <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
+            <h3>Cancelar Entrega</h3>
+            <input type="number" id="cancelOrderId" placeholder="ID del pedido a cancelar" style="padding: 8px; margin: 5px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
+            <button onclick="cancelOrder()" style="padding: 8px 15px; background-color: #881c1c; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancelar Entrega</button>
+            <p id="cancelMessage" style="margin-top: 10px; min-height: 20px;"></p>
+        </div>
+
+        <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
+            <h3>Reclamos</h3>
+            <div id="claimsContainer" style="background-color: #2a1f35; padding: 15px; border-radius: 5px;">
+                <p id="loadingClaimsMsg">Cargando reclamos...</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="navbar.js"></script>
+<script>
+    // Verificar que sea vendedor
+    requireRole('VENDEDOR');
+
+    const API = "http://localhost:8080";
+    let token = getCurrentToken();
+
+    // Cargar pedidos pendientes
+    async function loadPendingOrders() {
+        try {
+            const res = await fetch(`${API}/api/pedidos`, {
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            if (!res.ok) throw new Error('Error al cargar pedidos');
+
+            const pedidos = await res.json();
+            const container = document.getElementById('pendingOrdersContainer');
+
+            if (!pedidos || pedidos.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No hay pedidos pendientes</p>';
+                return;
+            }
+
+            let html = '<ul style="list-style: none; padding: 0;">';
+            pedidos.forEach(pedido => {
+                html += `
+                    <li style="background-color: #1a1520; padding: 12px; margin: 8px 0; border-left: 4px solid #bc2e7e; border-radius: 3px;">
+                        <strong>Pedido #${pedido.id}</strong> - Cliente: ${pedido.clienteNombre || 'N/A'}<br>
+                        Estado: <span style="color: #bc2e7e;">${pedido.estado || 'PENDIENTE'}</span><br>
+                        Total: $${pedido.precioTotal || 0}
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('loadingMsg').innerHTML = '❌ Error al cargar pedidos';
+        }
+    }
+
+    // Actualizar estado de pedido
+    async function updateOrderStatus() {
+        const orderId = document.getElementById('orderId').value;
+        const status = document.getElementById('orderStatus').value;
+        const msgEl = document.getElementById('statusMessage');
+
+        if (!orderId || !status) {
+            msgEl.innerHTML = '❌ Por favor completa todos los campos';
+            msgEl.style.color = '#ff6b6b';
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API}/api/pedidos/${orderId}/estado`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ estado: status })
+            });
+
+            if (!res.ok) throw new Error('Error al actualizar estado');
+
+            msgEl.innerHTML = '✅ Estado actualizado correctamente';
+            msgEl.style.color = '#51cf66';
+            document.getElementById('orderId').value = '';
+            document.getElementById('orderStatus').value = '';
+            
+            setTimeout(loadPendingOrders, 1000);
+
+        } catch (e) {
+            console.error(e);
+            msgEl.innerHTML = '❌ ' + e.message;
+            msgEl.style.color = '#ff6b6b';
+        }
+    }
+
+    // Cancelar entrega
+    async function cancelOrder() {
+        const orderId = document.getElementById('cancelOrderId').value;
+        const msgEl = document.getElementById('cancelMessage');
+
+        if (!orderId) {
+            msgEl.innerHTML = '❌ Por favor indica el ID del pedido';
+            msgEl.style.color = '#ff6b6b';
+            return;
+        }
+
+        const result = await Swal.fire({
+            title: '¿Cancelar entrega?',
+            text: `Se cancelará el pedido #${orderId}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#881c1c',
+            cancelButtonColor: '#444',
+            confirmButtonText: 'Sí, cancelar',
+            cancelButtonText: 'No',
+            background: '#231932',
+            color: '#ffffff'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const res = await fetch(`${API}/api/pedidos/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': token
+                }
+            });
+
+            if (!res.ok) throw new Error('Error al cancelar');
+
+            msgEl.innerHTML = '✅ Entrega cancelada correctamente';
+            msgEl.style.color = '#51cf66';
+            document.getElementById('cancelOrderId').value = '';
+            
+            setTimeout(loadPendingOrders, 1000);
+
+        } catch (e) {
+            console.error(e);
+            msgEl.innerHTML = '❌ ' + e.message;
+            msgEl.style.color = '#ff6b6b';
+        }
+    }
+
+    // Cargar reclamos
+    async function loadClaims() {
+        try {
+            const res = await fetch(`${API}/api/reclamos`, {
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            if (!res.ok) throw new Error('Error al cargar reclamos');
+
+            const reclamos = await res.json();
+            const container = document.getElementById('claimsContainer');
+
+            if (!reclamos || reclamos.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No hay reclamos</p>';
+                return;
+            }
+
+            let html = '<ul style="list-style: none; padding: 0;">';
+            reclamos.forEach(reclamo => {
+                html += `
+                    <li style="background-color: #1a1520; padding: 12px; margin: 8px 0; border-left: 4px solid #ff6b6b; border-radius: 3px;">
+                        <strong>Reclamo #${reclamo.id}</strong><br>
+                        Cliente: ${reclamo.clienteNombre || 'N/A'}<br>
+                        Descripción: ${reclamo.descripcion || 'N/A'}<br>
+                        Estado: <span style="color: #ff6b6b;">${reclamo.estado || 'ABIERTO'}</span>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('loadingClaimsMsg').innerHTML = '❌ Error al cargar reclamos';
+        }
+    }
+
+    // Cargar al iniciar
+    loadPendingOrders();
+    loadClaims();
+</script>
+
+</body>
+</html>

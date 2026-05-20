@@ -11,60 +11,9 @@
 
 <body>
 
-<div class="navbar">
+<div class="navbar"></div>
 
-    <div class="logo">
-        👑 Admin Panel
-    </div>
-
-    <div class="nav-links">
-
-        <a href="index.html">
-            <button>Inicio</button>
-        </a>
-
-        <a href="producto.html">
-            <button>Productos</button>
-        </a>
-
-        <a href="pedidos.html">
-            <button>Pedidos pendientes</button>
-        </a>
-
-    </div>
-
-</div>
-
-<div class="admin-page">
-
-    <div class="admin-login" id="loginBox">
-
-        <h1>Ingreso Administrador</h1>
-
-        <input
-                type="email"
-                id="adminEmail"
-                placeholder="Email admin"
-        >
-
-        <input
-                type="password"
-                id="adminPass"
-                placeholder="Contraseña"
-        >
-
-        <button onclick="loginAdmin()">
-            Ingresar
-        </button>
-
-        <p id="loginMsg"></p>
-
-    </div>
-
-    <div
-            class="admin-panel hidden"
-            id="adminPanel"
-    >
+<div class="admin-page" id="adminPanel">
 
         <h1>Crear Producto</h1>
 
@@ -126,61 +75,20 @@
         
         <p id="msgBaja"></p>
 
-        <h2>Configurar stock mínimo</h2>
-
-        <input id="productoIdStock" type="number" placeholder="ID producto">
-        <input id="stockMinimo" type="number" placeholder="Stock mínimo">
-
-        <button onclick="setStockMinimo()">
-            Guardar stock mínimo
-        </button>
-
-        <p id="msgStock"></p>
-
     </div>
 
 </div>
 
+<script src="auth.js"></script>
+<script src="navbar.js"></script>
 <script>
+
+    // Verificar que sea admin
+    requireRole('ADMIN');
 
     const API = "http://localhost:8080";
 
-    let token = "";
-
-    function loginAdmin(){
-
-        const email =
-            document.getElementById("adminEmail").value;
-
-        const pass =
-            document.getElementById("adminPass").value;
-
-        if(
-            email === "admin@bodypaint.com"
-            &&
-            pass === "1234"
-        ){
-
-            token =
-                "Basic " + btoa(email + ":" + pass);
-
-            console.log(token);
-
-            document
-                .getElementById("loginBox")
-                .classList.add("hidden");
-
-            document
-                .getElementById("adminPanel")
-                .classList.remove("hidden");
-
-        }else{
-
-            document.getElementById("loginMsg")
-                .innerHTML =
-                "❌ Credenciales incorrectas";
-        }
-    }
+    let token = getCurrentToken();
 
     document
         .getElementById("formProducto")
@@ -393,33 +301,7 @@
             }
         }
     }
-    async function setStockMinimo(){
 
-        const id = document.getElementById("productoIdStock").value;
-        const stockMin = document.getElementById("stockMinimo").value;
-
-        if(!id || stockMin === ""){
-            Swal.fire("Error","Datos incompletos","error");
-            return;
-        }
-
-        const res = await fetch(`${API}/api/productos/${id}/stock-minimo`, {
-            method:"PUT",
-            headers:{
-                "Content-Type":"application/json",
-                "Authorization": token
-            },
-            body: JSON.stringify({
-                stockMinimo: parseInt(stockMin)
-            })
-        });
-
-        if(res.ok){
-            Swal.fire("OK","Stock mínimo actualizado","success");
-        }else{
-            Swal.fire("Error","No se pudo actualizar","error");
-        }
-    }
 </script>
 
 </body>

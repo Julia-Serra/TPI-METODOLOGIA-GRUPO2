@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ActualizarPedidoService implements IActualizarPedidoService {
 
-    private final PedidoRepository pedidoRepository;
+    private PedidoRepository pedidoRepository;
 
     @Override
     public void actualizarEstado(Long pedidoId, ActualizarEstadoPedidoRequest request) {
