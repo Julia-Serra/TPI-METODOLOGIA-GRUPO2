@@ -31,7 +31,7 @@ public class PedidoConfirmService implements IPedidoConfirmService {
         }
 
         Cliente cliente = clienteRepository
-                .findByEmail(request.getEmailCliente())
+                .findByEmailIgnoreCase(request.getEmailCliente())
                 .orElseThrow(() ->
                         new BadRequestException("Cliente no encontrado"));
 

@@ -15,67 +15,34 @@
 
 <div class="admin-page" id="adminPanel">
 
+    <section>
         <h1>Crear Producto</h1>
-
         <form id="formProducto">
-
-            <input
-                    id="nombre"
-                    placeholder="Nombre"
-                    required
-            >
-
-            <input
-                    id="marca"
-                    placeholder="Marca"
-                    required
-            >
-
-            <input
-                    id="precio"
-                    type="number"
-                    placeholder="Precio"
-                    required
-            >
-
-            <input
-                    id="stock"
-                    type="number"
-                    placeholder="Stock"
-                    required
-            >
-
-            <button type="submit">
-                Crear Producto
-            </button>
-            <br>
+            <input id="nombre" placeholder="Nombre" required>
+            <input id="marca" placeholder="Marca" required>
+            <input id="precio" type="number" placeholder="Precio" required>
+            <input id="stock" type="number" placeholder="Stock" required>
+            <button type="submit">Crear Producto</button>
         </form>
-
         <p id="msg"></p>
-        
+    </section>
 
-        <h2>Importar imagen a producto</h2>
-
+    <section>
+        <h2>Importar Imagen a Producto</h2>
         <input id="productoIdImagen" type="number" placeholder="ID del producto">
-
         <input id="imagenArchivo" type="file" accept="image/*">
-
         <button id="btnSubirImagen">Subir Imagen</button>
-
         <p id="msgImagen"></p>
+    </section>
 
-
-        <h2>Acciones de Catálogo</h2>
-        
+    <section>
+        <h2>Dar de Baja Producto</h2>
         <input id="productoIdBaja" type="number" placeholder="ID del producto a dar de baja">
-        
         <button id="btnDarDeBaja" onclick="solicitarBajaProducto()" style="background-color: #881c1c; color: white;">
             🗑️ Dar de Baja Producto
         </button>
-        
         <p id="msgBaja"></p>
-
-    </div>
+    </section>
 
 </div>
 

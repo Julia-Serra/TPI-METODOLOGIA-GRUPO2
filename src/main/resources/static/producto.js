@@ -56,6 +56,8 @@ async function cargarProductos(
 
                 </div>
 
+                <p class="producto-id"><strong>ID: ${p.id}</strong></p>
+
                 <h3>${p.nombre}</h3>
 
                 <p>${p.marca}</p>

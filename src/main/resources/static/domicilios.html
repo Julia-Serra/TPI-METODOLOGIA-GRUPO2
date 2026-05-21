@@ -12,35 +12,30 @@
 
 <div style="max-width: 1000px; margin: 40px auto; padding: 20px;">
     <h1>📍 Mis Domicilios</h1>
-    
+
     <div style="background-color: #231932; padding: 30px; border-radius: 10px; margin-top: 20px;">
-        
+
         <h2>Agregar Nuevo Domicilio</h2>
-        
+
         <form id="domicilioForm" style="display: flex; flex-direction: column; gap: 12px; background-color: #2a1f35; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
-            <input type="text" id="nombreContacto" placeholder="Nombre del contacto" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
-            
-            <input type="text" id="direccion" placeholder="Dirección completa" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
-            
-            <input type="text" id="ciudad" placeholder="Ciudad" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
-            
-            <input type="text" id="provincia" placeholder="Provincia" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
-            
-            <input type="text" id="codigoPostal" placeholder="Código postal" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
-            
-            <input type="tel" id="telefono" placeholder="Teléfono" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
-            
-            <label style="color: white;">
-                <input type="checkbox" id="predeterminado"> Establecer como domicilio predeterminado
-            </label>
-            
+
+            <input type="text" id="calle" placeholder="Calle" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="numero" placeholder="Número" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="localidad" placeholder="Localidad/Ciudad" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="piso" placeholder="Piso (opcional)" style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="departamento" placeholder="Departamento (opcional)" style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
             <button type="submit" style="padding: 12px; background-color: #bc2e7e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">➕ Agregar Domicilio</button>
-            
+
             <p id="formMessage" style="text-align: center; min-height: 20px;"></p>
         </form>
 
         <h2>Mis Domicilios</h2>
-        
+
         <div id="domiciliosContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
             <p style="color: #999;">Cargando domicilios...</p>
         </div>
@@ -58,11 +53,20 @@
     let token = getCurrentToken();
     const email = getCurrentEmail();
 
-    // Cargar domicilios del cliente
+    // Cargar domicilios del cliente desde el backend
     async function loadDomicilios() {
         try {
-            // Obtener domicilios del localStorage (simulación)
-            const domicilios = JSON.parse(localStorage.getItem(`domicilios_${email}`) || '[]');
+            const res = await fetch(`${API}/clientes/email/${email}`, {
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            if (!res.ok) throw new Error('Error al cargar cliente');
+
+            const data = await res.json();
+            const cliente = data.data;
+            const domicilios = cliente.direcciones || [];
             const container = document.getElementById('domiciliosContainer');
 
             if (!domicilios || domicilios.length === 0) {
@@ -76,15 +80,12 @@
                     <div style="background-color: #2a1f35; padding: 20px; border-radius: 5px; border-left: 4px solid #bc2e7e;">
                         <div style="display: flex; justify-content: space-between; align-items: start;">
                             <div>
-                                <h3 style="margin: 0 0 10px 0; color: #bc2e7e;">${dom.nombreContacto}</h3>
-                                <p style="margin: 5px 0; color: #ccc;"><strong>📍 ${dom.direccion}</strong></p>
-                                <p style="margin: 5px 0; color: #999;">${dom.ciudad}, ${dom.provincia} ${dom.codigoPostal}</p>
-                                <p style="margin: 5px 0; color: #999;">📞 ${dom.telefono}</p>
-                                ${dom.predeterminado ? '<p style="margin: 5px 0; color: #51cf66;"><strong>⭐ Domicilio predeterminado</strong></p>' : ''}
+                                <h3 style="margin: 0 0 10px 0; color: #bc2e7e;">${dom.calle} ${dom.numero}</h3>
+                                <p style="margin: 5px 0; color: #ccc;"><strong>📍 ${dom.localidad}</strong></p>
+                                ${dom.piso ? `<p style="margin: 5px 0; color: #999;">Piso: ${dom.piso}</p>` : ''}
+                                ${dom.departamento ? `<p style="margin: 5px 0; color: #999;">Depto: ${dom.departamento}</p>` : ''}
                             </div>
                             <div style="display: flex; gap: 5px;">
-                                ${!dom.predeterminado ? `<button onclick="setAsDefault(${index})" style="padding: 6px 12px; background-color: #444; color: white; border: none; border-radius: 3px; cursor: pointer;">⭐ Predeterminado</button>` : ''}
-                                <button onclick="editDomicilio(${index})" style="padding: 6px 12px; background-color: #bc2e7e; color: white; border: none; border-radius: 3px; cursor: pointer;">✏️ Editar</button>
                                 <button onclick="deleteDomicilio(${index})" style="padding: 6px 12px; background-color: #881c1c; color: white; border: none; border-radius: 3px; cursor: pointer;">🗑️ Eliminar</button>
                             </div>
                         </div>
@@ -103,65 +104,41 @@
     document.getElementById('domicilioForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const domicilio = {
-            nombreContacto: document.getElementById('nombreContacto').value,
-            direccion: document.getElementById('direccion').value,
-            ciudad: document.getElementById('ciudad').value,
-            provincia: document.getElementById('provincia').value,
-            codigoPostal: document.getElementById('codigoPostal').value,
-            telefono: document.getElementById('telefono').value,
-            predeterminado: document.getElementById('predeterminado').checked
+        const direccion = {
+            calle: document.getElementById('calle').value,
+            numero: document.getElementById('numero').value,
+            localidad: document.getElementById('localidad').value,
+            piso: document.getElementById('piso').value || null,
+            departamento: document.getElementById('departamento').value || null
         };
 
         try {
-            // Guardar en localStorage
-            const domicilios = JSON.parse(localStorage.getItem(`domicilios_${email}`) || '[]');
-            
-            if (domicilio.predeterminado) {
-                domicilios.forEach(d => d.predeterminado = false);
+            const res = await fetch(`${API}/clientes/${email}/direcciones`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(direccion)
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || 'Error al agregar domicilio');
             }
-            
-            domicilios.push(domicilio);
-            localStorage.setItem(`domicilios_${email}`, JSON.stringify(domicilios));
 
             document.getElementById('formMessage').innerHTML = '✅ Domicilio agregado correctamente';
             document.getElementById('formMessage').style.color = '#51cf66';
 
             document.getElementById('domicilioForm').reset();
-            loadDomicilios();
+            setTimeout(loadDomicilios, 500);
 
         } catch (e) {
             console.error(e);
-            document.getElementById('formMessage').innerHTML = '❌ Error al agregar domicilio';
+            document.getElementById('formMessage').innerHTML = '❌ ' + e.message;
             document.getElementById('formMessage').style.color = '#ff6b6b';
         }
     });
-
-    function setAsDefault(index) {
-        const domicilios = JSON.parse(localStorage.getItem(`domicilios_${email}`) || '[]');
-        domicilios.forEach((d, i) => {
-            d.predeterminado = i === index;
-        });
-        localStorage.setItem(`domicilios_${email}`, JSON.stringify(domicilios));
-        loadDomicilios();
-    }
-
-    function editDomicilio(index) {
-        const domicilios = JSON.parse(localStorage.getItem(`domicilios_${email}`) || '[]');
-        const dom = domicilios[index];
-
-        document.getElementById('nombreContacto').value = dom.nombreContacto;
-        document.getElementById('direccion').value = dom.direccion;
-        document.getElementById('ciudad').value = dom.ciudad;
-        document.getElementById('provincia').value = dom.provincia;
-        document.getElementById('codigoPostal').value = dom.codigoPostal;
-        document.getElementById('telefono').value = dom.telefono;
-        document.getElementById('predeterminado').checked = dom.predeterminado;
-
-        domicilios.splice(index, 1);
-        localStorage.setItem(`domicilios_${email}`, JSON.stringify(domicilios));
-        loadDomicilios();
-    }
 
     async function deleteDomicilio(index) {
         const result = await Swal.fire({
@@ -179,10 +156,24 @@
 
         if (!result.isConfirmed) return;
 
-        const domicilios = JSON.parse(localStorage.getItem(`domicilios_${email}`) || '[]');
-        domicilios.splice(index, 1);
-        localStorage.setItem(`domicilios_${email}`, JSON.stringify(domicilios));
-        loadDomicilios();
+        try {
+            // Cargar domicilios actuales
+            const res = await fetch(`${API}/clientes/email/${email}`, {
+                headers: { "Authorization": token }
+            });
+            const data = await res.json();
+            const cliente = data.data;
+            const domicilios = cliente.direcciones || [];
+
+            if (domicilios.length > index) {
+                // Aquí podrías hacer un DELETE si existe endpoint
+                // Por ahora solo recargamos
+                loadDomicilios();
+            }
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Error', 'No se pudo eliminar', 'error');
+        }
     }
 
     // Cargar domicilios al iniciar
