@@ -84,11 +84,17 @@ public class PedidoConfirmService implements IPedidoConfirmService {
         }
         Pedido pedido = Pedido.builder()
                 .cliente(cliente)
-                .items(new java.util.ArrayList<>(carrito.getItems()))
+                .items(new java.util.ArrayList<>())
                 .domicilioEnvio(request.getDomicilioEnvio())
                 .formaPago(request.getFormaPago())
                 .estado(EstadoPedido.PENDIENTE_PREPARACION)
                 .build();
+
+        // Establecer la relación bidireccional
+        for (ItemCarrito item : carrito.getItems()) {
+            item.setPedido(pedido);
+            pedido.getItems().add(item);
+        }
 
         return pedidoRepository.save(pedido);
     }

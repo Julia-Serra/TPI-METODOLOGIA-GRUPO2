@@ -20,5 +20,8 @@ public class ItemCarrito {
     @ManyToOne
     private Producto producto;
 
+    @ManyToOne
+    private Pedido pedido;
+
     private int cantidad;
 }

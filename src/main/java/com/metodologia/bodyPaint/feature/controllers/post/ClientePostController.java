@@ -19,11 +19,12 @@ import lombok.RequiredArgsConstructor;
 public class ClientePostController {
 
     private final IClienteCreateService clienteCreateService;
+    private final ClienteMapper clienteMapper;
 
     @PostMapping
     public BaseResponse<Void>crear(@Valid @RequestBody ClienteRequest request) {
 
-        Cliente cliente = ClienteMapper.toEntity(request);
+        Cliente cliente = clienteMapper.toEntity(request);
 
         clienteCreateService.crear(cliente);
 

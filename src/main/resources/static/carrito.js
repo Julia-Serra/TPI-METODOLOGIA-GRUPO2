@@ -239,27 +239,44 @@ async function buscarCliente() {
     const email =
         document.getElementById(
             "emailCliente"
-        ).value;
+        ).value.trim();
 
-    const response =
-        await fetch(
-            `${API}/clientes/email/${email}`
-        );
-
-    if(!response.ok){
-
-        alert("Cliente no encontrado");
-
+    if (!email) {
+        alert("Por favor ingresa un email");
         return;
     }
 
-    const data = await response.json();
+    try {
+        const response =
+            await fetch(
+                `${API}/clientes/email/${email}`
+            );
 
-    clienteActual = data.data;
+        if(!response.ok){
+            const error = await response.json();
+            alert("Cliente no encontrado: " + (error.message || "El cliente no existe en el sistema"));
+            return;
+        }
 
-    cargarDirecciones(
-        clienteActual.direcciones
-    );
+        const data = await response.json();
+
+        clienteActual = data.data;
+
+        if (!clienteActual) {
+            alert("Error al cargar datos del cliente");
+            return;
+        }
+
+        cargarDirecciones(
+            clienteActual.direcciones || []
+        );
+
+        alert("✅ Cliente encontrado: " + clienteActual.nombre + " " + clienteActual.apellido);
+
+    } catch (e) {
+        console.error(e);
+        alert("❌ Error de conexión: " + e.message);
+    }
 }
 
 function cargarDirecciones(direcciones){

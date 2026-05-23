@@ -164,19 +164,24 @@
                     body: formData
                 });
 
+            const data = await res.json();
+
             if (!res.ok) {
                 msg.innerHTML =
-                    "❌ Error al subir imagen";
+                    "❌ " + (data.message || "Error al subir imagen");
                 return;
             }
 
             msg.innerHTML =
                 "✅ Imagen subida correctamente";
 
-        } catch (e) {
+            document.getElementById("productoIdImagen").value = "";
+            document.getElementById("imagenArchivo").value = "";
 
+        } catch (e) {
+            console.error(e);
             msg.innerHTML =
-                "❌ Error de conexión";
+                "❌ Error de conexión: " + e.message;
         }
     });
 

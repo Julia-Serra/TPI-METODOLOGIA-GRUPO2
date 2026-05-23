@@ -10,13 +10,13 @@
 
 <div class="navbar"></div>
 
-<div style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+<div style="max-width: 1200px; margin: 40px auto; padding: 20px;">
     <h1>📦 Panel del Vendedor</h1>
-    
+
     <div style="background-color: #231932; padding: 30px; border-radius: 10px; margin-top: 20px;">
-        
+
         <h2>Gestión de Pedidos</h2>
-        
+
         <div style="margin: 20px 0;">
             <h3>Pedidos Pendientes</h3>
             <div id="pendingOrdersContainer" style="background-color: #2a1f35; padding: 15px; border-radius: 5px;">
@@ -26,13 +26,26 @@
 
         <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
             <h3>Actualizar Estado de Pedido</h3>
-            <p style="color: #999;">Funcionalidad no disponible en esta versión</p>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="number" id="updateOrderId" placeholder="ID del pedido" style="padding: 8px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
+                <select id="newStatus" style="padding: 8px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
+                    <option value="">Seleccionar estado</option>
+                    <option value="CONFIRMADO">Confirmado</option>
+                    <option value="LISTO">Listo para enviar</option>
+                    <option value="RETIRADO_POR_CORREO">Retirado por correo</option>
+                    <option value="ENTREGADO">Entregado</option>
+                </select>
+                <button onclick="actualizarEstadoPedido()" style="padding: 8px 15px; background-color: #bc2e7e; color: white; border: none; border-radius: 5px; cursor: pointer;">Actualizar</button>
+            </div>
+            <p id="updateMessage" style="margin-top: 10px; min-height: 20px;"></p>
         </div>
 
         <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
             <h3>Cancelar Entrega</h3>
-            <input type="number" id="cancelOrderId" placeholder="ID del pedido a cancelar" style="padding: 8px; margin: 5px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
-            <button onclick="cancelOrder()" style="padding: 8px 15px; background-color: #881c1c; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancelar Pedido</button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="number" id="cancelOrderId" placeholder="ID del pedido a cancelar" style="padding: 8px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
+                <button onclick="cancelOrder()" style="padding: 8px 15px; background-color: #881c1c; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancelar Pedido</button>
+            </div>
             <p id="cancelMessage" style="margin-top: 10px; min-height: 20px;"></p>
         </div>
 
@@ -49,13 +62,11 @@
 <script src="auth.js"></script>
 <script src="navbar.js"></script>
 <script>
-    // Verificar que sea vendedor
     requireRole('VENDEDOR');
 
     const API = "http://localhost:8080";
     let token = getCurrentToken();
 
-    // Cargar pedidos pendientes
     async function loadPendingOrders() {
         try {
             const res = await fetch(`${API}/pedidos/pendientes`, {
@@ -75,17 +86,30 @@
                 return;
             }
 
-            let html = '<ul style="list-style: none; padding: 0;">';
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 15px;">';
             pedidos.forEach(pedido => {
+                let itemsHtml = '';
+                if (pedido.items && pedido.items.length > 0) {
+                    itemsHtml = pedido.items.map(item =>
+                        `<li>${item.producto.nombre} (${item.producto.marca}) - Cant: ${item.cantidad} - $${(item.producto.precio * item.cantidad).toFixed(2)}</li>`
+                    ).join('');
+                }
+
                 html += `
-                    <li style="background-color: #1a1520; padding: 12px; margin: 8px 0; border-left: 4px solid #bc2e7e; border-radius: 3px;">
-                        <strong>Pedido #${pedido.id}</strong> - Cliente: ${pedido.cliente.nombre || 'N/A'}<br>
-                        Estado: <span style="color: #bc2e7e;">${pedido.estado || 'PENDIENTE'}</span><br>
-                        Email: ${pedido.cliente.email || 'N/A'}
-                    </li>
+                    <div style="background-color: #1a1520; padding: 15px; border-left: 4px solid #bc2e7e; border-radius: 3px;">
+                        <strong style="font-size: 18px; color: #bc2e7e;">Pedido #${pedido.id}</strong>
+                        <p><strong>Cliente:</strong> ${pedido.cliente.nombre || 'N/A'} ${pedido.cliente.apellido || 'N/A'}</p>
+                        <p><strong>Email:</strong> ${pedido.cliente.email || 'N/A'}</p>
+                        <p><strong>Teléfono:</strong> ${pedido.cliente.telefono || 'N/A'}</p>
+                        <p><strong>Estado:</strong> <span style="color: #bc2e7e; font-weight: bold;">${pedido.estado || 'PENDIENTE'}</span></p>
+                        <p><strong>Forma de pago:</strong> ${pedido.formaPago || 'N/A'}</p>
+                        <p><strong>Domicilio:</strong> ${pedido.domicilioEnvio.calle} ${pedido.domicilioEnvio.numero}, ${pedido.domicilioEnvio.localidad}</p>
+                        <p><strong>Productos:</strong></p>
+                        <ul style="margin: 5px 0; padding-left: 20px;">${itemsHtml}</ul>
+                    </div>
                 `;
             });
-            html += '</ul>';
+            html += '</div>';
             container.innerHTML = html;
 
         } catch (e) {
@@ -94,7 +118,43 @@
         }
     }
 
-    // Cancelar pedido
+    async function actualizarEstadoPedido() {
+        const orderId = document.getElementById('updateOrderId').value;
+        const newStatus = document.getElementById('newStatus').value;
+        const msgEl = document.getElementById('updateMessage');
+
+        if (!orderId || !newStatus) {
+            msgEl.innerHTML = '❌ Por favor completa todos los campos';
+            msgEl.style.color = '#ff6b6b';
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API}/pedidos/${orderId}/estado`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ estado: newStatus })
+            });
+
+            if (!res.ok) throw new Error('Error al actualizar');
+
+            msgEl.innerHTML = '✅ Estado actualizado correctamente';
+            msgEl.style.color = '#51cf66';
+            document.getElementById('updateOrderId').value = '';
+            document.getElementById('newStatus').value = '';
+
+            setTimeout(loadPendingOrders, 1000);
+
+        } catch (e) {
+            console.error(e);
+            msgEl.innerHTML = '❌ ' + e.message;
+            msgEl.style.color = '#ff6b6b';
+        }
+    }
+
     async function cancelOrder() {
         const orderId = document.getElementById('cancelOrderId').value;
         const msgEl = document.getElementById('cancelMessage');
@@ -145,8 +205,8 @@
         }
     }
 
-    // Cargar al iniciar
     loadPendingOrders();
+    setInterval(loadPendingOrders, 30000);
 </script>
 
 </body>
