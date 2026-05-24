@@ -320,11 +320,14 @@
                 messageEl.textContent = '✅ Registro exitoso, iniciando sesión...';
                 messageEl.className = 'auth-message success';
 
+                // Agregar usuario dinámicamente al sistema de autenticación
+                addUser(email, password, 'CLIENTE');
+
                 // Crear sesión local
                 const session = {
                     email: email,
                     role: 'CLIENTE',
-                    token: 'Basic ' + btoa(email + ':' + password),
+                    token: 'Bearer ' + btoa(email + ':' + password),
                     loginTime: new Date().toISOString()
                 };
 

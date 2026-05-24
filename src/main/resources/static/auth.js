@@ -1,11 +1,33 @@
 // Sistema de autenticación simple con sessionStorage
 // Usuarios predefinidos (solo para demostración)
 
-const USERS = {
+let USERS = {
   'admin@bodypaint.com': { password: '1234', role: 'ADMIN' },
   'cliente@bodypaint.com': { password: '1234', role: 'CLIENTE' },
   'vendedor@bodypaint.com': { password: '1234', role: 'VENDEDOR' }
 };
+
+// Cargar usuarios registrados desde localStorage
+function loadUsersFromStorage() {
+  const storedUsers = localStorage.getItem('registered_users');
+  if (storedUsers) {
+    try {
+      const parsed = JSON.parse(storedUsers);
+      USERS = { ...USERS, ...parsed };
+    } catch (e) {
+      console.error('Error cargando usuarios:', e);
+    }
+  }
+}
+
+// Guardar usuarios en localStorage
+function saveUsersToStorage() {
+  const allUsers = { ...USERS };
+  localStorage.setItem('registered_users', JSON.stringify(allUsers));
+}
+
+// Cargar usuarios al inicializar
+loadUsersFromStorage();
 
 // Obtener sesión actual
 function getCurrentSession() {
@@ -30,18 +52,24 @@ function hasRole(role) {
   return currentRole === role;
 }
 
+// Agregar usuario dinámicamente
+function addUser(email, password, role = 'CLIENTE') {
+  USERS[email] = { password: password, role: role };
+  saveUsersToStorage();
+}
+
 // Login
 function login(email, password) {
   const user = USERS[email];
-  
+
   if (!user) {
     return { success: false, message: 'Email no registrado' };
   }
-  
+
   if (user.password !== password) {
     return { success: false, message: 'Contraseña incorrecta' };
   }
-  
+
   // Crear sesión
   const session = {
     email: email,
@@ -49,7 +77,7 @@ function login(email, password) {
     token: 'Bearer ' + btoa(email + ':' + password),
     loginTime: new Date().toISOString()
   };
-  
+
   sessionStorage.setItem('auth_session', JSON.stringify(session));
   return { success: true, role: user.role };
 }

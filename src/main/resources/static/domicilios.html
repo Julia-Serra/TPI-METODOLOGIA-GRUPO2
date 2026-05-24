@@ -19,11 +19,15 @@
 
         <form id="domicilioForm" style="display: flex; flex-direction: column; gap: 12px; background-color: #2a1f35; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
 
+            <input type="text" id="pais" placeholder="País" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="provincia" placeholder="Provincia" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="localidad" placeholder="Localidad/Ciudad" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
             <input type="text" id="calle" placeholder="Calle" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
 
             <input type="text" id="numero" placeholder="Número" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
-
-            <input type="text" id="localidad" placeholder="Localidad/Ciudad" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
 
             <input type="text" id="piso" placeholder="Piso (opcional)" style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
 
@@ -105,9 +109,11 @@
         e.preventDefault();
 
         const direccion = {
+            pais: document.getElementById('pais').value,
+            provincia: document.getElementById('provincia').value,
+            localidad: document.getElementById('localidad').value,
             calle: document.getElementById('calle').value,
             numero: document.getElementById('numero').value,
-            localidad: document.getElementById('localidad').value,
             piso: document.getElementById('piso').value || null,
             departamento: document.getElementById('departamento').value || null
         };
