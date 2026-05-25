@@ -1,18 +1,24 @@
 const API = "http://localhost:8080";
 
 async function cargarPedidos() {
-
     try {
-        const res = await fetch(`${API}/pedidos/pendientes`);
+        const email = getCurrentEmail();
+        let url = `${API}/pedidos/pendientes`;
+
+        if (email) {
+            url = `${API}/pedidos/pendientes/cliente?email=${encodeURIComponent(email)}`;
+        }
+
+        const res = await fetch(url);
         const data = await res.json();
         const grid = document.getElementById("pedidosGrid");
-
-        grid.innerHTML = "";
 
         if (!data.data || data.data.length === 0) {
             grid.innerHTML = `<p class="empty">No hay pedidos pendientes</p>`;
             return;
         }
+
+        grid.innerHTML = "";
 
         data.data.forEach(pedido => {
 
@@ -38,9 +44,9 @@ async function cargarPedidos() {
                     <p>Forma de pago: ${pedido.formaPago}</p>
 
                     <p>
-                        Domicilio: 
-                        ${pedido.domicilioEnvio.calle} 
-                        ${pedido.domicilioEnvio.numero}, 
+                        Domicilio:
+                        ${pedido.domicilioEnvio.calle}
+                        ${pedido.domicilioEnvio.numero},
                         ${pedido.domicilioEnvio.localidad}
                     </p>
 
@@ -73,6 +79,7 @@ async function cargarPedidos() {
             `<p class="empty">Error al cargar pedidos</p>`;
     }
 }
+
 async function cancelarPedido(id) {
 
     const { value: motivo } = await Swal.fire({
@@ -128,4 +135,6 @@ async function cancelarPedido(id) {
         });
     }
 }
+
 cargarPedidos();
+setInterval(cargarPedidos, 5000);

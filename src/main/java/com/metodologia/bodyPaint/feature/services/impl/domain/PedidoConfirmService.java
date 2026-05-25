@@ -90,10 +90,13 @@ public class PedidoConfirmService implements IPedidoConfirmService {
                 .estado(EstadoPedido.PENDIENTE_PREPARACION)
                 .build();
 
-        // Establecer la relación bidireccional
         for (ItemCarrito item : carrito.getItems()) {
-            item.setPedido(pedido);
-            pedido.getItems().add(item);
+            ItemCarrito nuevoItem = ItemCarrito.builder()
+                    .producto(item.getProducto())
+                    .cantidad(item.getCantidad())
+                    .pedido(pedido)
+                    .build();
+            pedido.getItems().add(nuevoItem);
         }
 
         return pedidoRepository.save(pedido);

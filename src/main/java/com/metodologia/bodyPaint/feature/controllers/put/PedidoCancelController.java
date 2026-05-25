@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.metodologia.bodyPaint.config.BaseResponse;
 import com.metodologia.bodyPaint.feature.dtos.request.CancelarPedidoRequest;
 import com.metodologia.bodyPaint.feature.services.interfaces.domain.IPedidoCancelService;
 
@@ -19,9 +20,10 @@ public class PedidoCancelController {
     private final IPedidoCancelService pedidoCancelService;
 
     @PutMapping("/{id}/cancelar")
-    public void cancelarPedido(@PathVariable Long id,
+    public BaseResponse<Void> cancelarPedido(@PathVariable Long id,
                                @RequestBody CancelarPedidoRequest request) {
 
         pedidoCancelService.cancelarPedido(id, request);
+        return BaseResponse.ok(null, "Pedido cancelado correctamente");
     }
 }
