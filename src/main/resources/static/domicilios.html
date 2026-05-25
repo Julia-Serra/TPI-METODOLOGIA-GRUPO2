@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Domicilios | BodyPaint</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<div class="navbar"></div>
+
+<div style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+    <h1>📍 Mis Domicilios</h1>
+
+    <div style="background-color: #231932; padding: 30px; border-radius: 10px; margin-top: 20px;">
+
+        <h2>Agregar Nuevo Domicilio</h2>
+
+        <form id="domicilioForm" style="display: flex; flex-direction: column; gap: 12px; background-color: #2a1f35; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
+
+            <input type="text" id="pais" placeholder="País" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="provincia" placeholder="Provincia" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="localidad" placeholder="Localidad/Ciudad" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="calle" placeholder="Calle" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="numero" placeholder="Número" required style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="piso" placeholder="Piso (opcional)" style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <input type="text" id="departamento" placeholder="Departamento (opcional)" style="padding: 10px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #1a1520; color: white;">
+
+            <button type="submit" style="padding: 12px; background-color: #bc2e7e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">➕ Agregar Domicilio</button>
+
+            <p id="formMessage" style="text-align: center; min-height: 20px;"></p>
+        </form>
+
+        <h2>Mis Domicilios</h2>
+
+        <div id="domiciliosContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
+            <p style="color: #999;">Cargando domicilios...</p>
+        </div>
+
+    </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="navbar.js"></script>
+<script>
+    // Verificar que sea cliente
+    requireRole('CLIENTE');
+
+    const API = "http://localhost:8080";
+    let token = getCurrentToken();
+    const email = getCurrentEmail();
+
+    // Cargar domicilios del cliente desde el backend
+    async function loadDomicilios() {
+        try {
+            const res = await fetch(`${API}/clientes/email/${email}`, {
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            if (!res.ok) throw new Error('Error al cargar cliente');
+
+            const data = await res.json();
+            const cliente = data.data;
+            const domicilios = cliente.direcciones || [];
+            const container = document.getElementById('domiciliosContainer');
+
+            if (!domicilios || domicilios.length === 0) {
+                container.innerHTML = '<p style="color: #999; grid-column: 1/-1;">No tienes domicilios registrados aún</p>';
+                return;
+            }
+
+            let html = '';
+            domicilios.forEach((dom, index) => {
+                html += `
+                    <div style="background-color: #2a1f35; padding: 20px; border-radius: 5px; border-left: 4px solid #bc2e7e;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <h3 style="margin: 0 0 10px 0; color: #bc2e7e;">${dom.calle} ${dom.numero}</h3>
+                                <p style="margin: 5px 0; color: #ccc;"><strong>📍 ${dom.localidad}</strong></p>
+                                ${dom.piso ? `<p style="margin: 5px 0; color: #999;">Piso: ${dom.piso}</p>` : ''}
+                                ${dom.departamento ? `<p style="margin: 5px 0; color: #999;">Depto: ${dom.departamento}</p>` : ''}
+                            </div>
+                            <div style="display: flex; gap: 5px;">
+                                <button onclick="deleteDomicilio(${index})" style="padding: 6px 12px; background-color: #881c1c; color: white; border: none; border-radius: 3px; cursor: pointer;">🗑️ Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('domiciliosContainer').innerHTML = '<p style="color: #ff6b6b;">Error al cargar domicilios</p>';
+        }
+    }
+
+    // Agregar domicilio
+    document.getElementById('domicilioForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const direccion = {
+            pais: document.getElementById('pais').value,
+            provincia: document.getElementById('provincia').value,
+            localidad: document.getElementById('localidad').value,
+            calle: document.getElementById('calle').value,
+            numero: document.getElementById('numero').value,
+            piso: document.getElementById('piso').value || null,
+            departamento: document.getElementById('departamento').value || null
+        };
+
+        try {
+            const res = await fetch(`${API}/clientes/${email}/direcciones`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(direccion)
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || 'Error al agregar domicilio');
+            }
+
+            document.getElementById('formMessage').innerHTML = '✅ Domicilio agregado correctamente';
+            document.getElementById('formMessage').style.color = '#51cf66';
+
+            document.getElementById('domicilioForm').reset();
+            setTimeout(loadDomicilios, 500);
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('formMessage').innerHTML = '❌ ' + e.message;
+            document.getElementById('formMessage').style.color = '#ff6b6b';
+        }
+    });
+
+    async function deleteDomicilio(index) {
+        const result = await Swal.fire({
+            title: '¿Eliminar domicilio?',
+            text: 'Esta acción no se puede deshacer',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#881c1c',
+            cancelButtonColor: '#444',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            background: '#231932',
+            color: '#ffffff'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            // Cargar domicilios actuales
+            const res = await fetch(`${API}/clientes/email/${email}`, {
+                headers: { "Authorization": token }
+            });
+            const data = await res.json();
+            const cliente = data.data;
+            const domicilios = cliente.direcciones || [];
+
+            if (domicilios.length > index) {
+                // Aquí podrías hacer un DELETE si existe endpoint
+                // Por ahora solo recargamos
+                loadDomicilios();
+            }
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Error', 'No se pudo eliminar', 'error');
+        }
+    }
+
+    // Cargar domicilios al iniciar
+    loadDomicilios();
+</script>
+
+</body>
+</html>

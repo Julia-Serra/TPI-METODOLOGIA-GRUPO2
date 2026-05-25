@@ -34,7 +34,7 @@ public class ClienteCreateService implements IClienteCreateService {
 
     public void agregarDireccion(String email, Direccion direccion) {
 
-        Cliente cliente = clienteRepository.findByEmail(email)
+        Cliente cliente = clienteRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new BadRequestException("Cliente no encontrado"));
         if (cliente.getDirecciones() == null) {
             cliente.setDirecciones(new ArrayList<>());

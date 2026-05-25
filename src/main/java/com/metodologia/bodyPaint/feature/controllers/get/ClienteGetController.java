@@ -31,7 +31,7 @@ public class ClienteGetController {
     ) {
 
         Cliente cliente = clienteRepository
-                .findByEmail(email)
+                .findByEmailIgnoreCase(email)
                 .orElseThrow(() ->
                         new BadRequestException(
                                 "Cliente no encontrado"

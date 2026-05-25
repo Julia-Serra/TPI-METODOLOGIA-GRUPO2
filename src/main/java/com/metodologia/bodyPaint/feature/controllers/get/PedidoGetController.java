@@ -6,6 +6,7 @@ import com.metodologia.bodyPaint.feature.services.impl.domain.PedidoGetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,5 +22,11 @@ public class PedidoGetController {
     public BaseResponse<List<Pedido>> listarPendientes() {
         List<Pedido> pedidos = pedidoGetService.listarPendientes();
         return BaseResponse.ok(pedidos, "Pedidos pendientes");
+    }
+
+    @GetMapping("/pendientes/cliente")
+    public BaseResponse<List<Pedido>> listarPendientesDelCliente(@RequestParam String email) {
+        List<Pedido> pedidos = pedidoGetService.listarPendientesDelCliente(email);
+        return BaseResponse.ok(pedidos, "Pedidos pendientes del cliente");
     }
 }

@@ -31,7 +31,7 @@ public class PedidoConfirmService implements IPedidoConfirmService {
         }
 
         Cliente cliente = clienteRepository
-                .findByEmail(request.getEmailCliente())
+                .findByEmailIgnoreCase(request.getEmailCliente())
                 .orElseThrow(() ->
                         new BadRequestException("Cliente no encontrado"));
 
@@ -84,11 +84,20 @@ public class PedidoConfirmService implements IPedidoConfirmService {
         }
         Pedido pedido = Pedido.builder()
                 .cliente(cliente)
-                .items(new java.util.ArrayList<>(carrito.getItems()))
+                .items(new java.util.ArrayList<>())
                 .domicilioEnvio(request.getDomicilioEnvio())
                 .formaPago(request.getFormaPago())
                 .estado(EstadoPedido.PENDIENTE_PREPARACION)
                 .build();
+
+        for (ItemCarrito item : carrito.getItems()) {
+            ItemCarrito nuevoItem = ItemCarrito.builder()
+                    .producto(item.getProducto())
+                    .cantidad(item.getCantidad())
+                    .pedido(pedido)
+                    .build();
+            pedido.getItems().add(nuevoItem);
+        }
 
         return pedidoRepository.save(pedido);
     }

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Vendedor | BodyPaint</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<div class="navbar"></div>
+
+<div style="max-width: 1200px; margin: 40px auto; padding: 20px;">
+    <h1>📦 Panel del Vendedor</h1>
+
+    <div style="background-color: #231932; padding: 30px; border-radius: 10px; margin-top: 20px;">
+
+        <h2>Gestión de Pedidos</h2>
+
+        <div style="margin: 20px 0;">
+            <h3>Pedidos Pendientes</h3>
+            <div id="pendingOrdersContainer" style="background-color: #2a1f35; padding: 15px; border-radius: 5px;">
+                <p id="loadingMsg">Cargando pedidos...</p>
+            </div>
+        </div>
+
+        <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
+            <h3>Actualizar Estado de Pedido</h3>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="number" id="updateOrderId" placeholder="ID del pedido" style="padding: 8px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
+                <select id="newStatus" style="padding: 8px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
+                    <option value="">Seleccionar estado</option>
+                    <option value="CONFIRMADO">Confirmado</option>
+                    <option value="LISTO">Listo para enviar</option>
+                    <option value="RETIRADO_POR_CORREO">Retirado por correo</option>
+                    <option value="ENTREGADO">Entregado</option>
+                </select>
+                <button onclick="actualizarEstadoPedido()" style="padding: 8px 15px; background-color: #bc2e7e; color: white; border: none; border-radius: 5px; cursor: pointer;">Actualizar</button>
+            </div>
+            <p id="updateMessage" style="margin-top: 10px; min-height: 20px;"></p>
+        </div>
+
+        <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
+            <h3>Cancelar Entrega</h3>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="number" id="cancelOrderId" placeholder="ID del pedido a cancelar" style="padding: 8px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
+                <button onclick="cancelOrder()" style="padding: 8px 15px; background-color: #881c1c; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancelar Pedido</button>
+            </div>
+            <p id="cancelMessage" style="margin-top: 10px; min-height: 20px;"></p>
+        </div>
+
+        <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
+            <h3>Reclamos</h3>
+            <div id="claimsContainer" style="background-color: #2a1f35; padding: 15px; border-radius: 5px;">
+                <p id="loadingClaimsMsg">No hay reclamos en este momento</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="navbar.js"></script>
+<script>
+    requireRole('VENDEDOR');
+
+    const API = "http://localhost:8080";
+    let token = getCurrentToken();
+
+    async function loadPendingOrders() {
+        try {
+            const res = await fetch(`${API}/pedidos/pendientes`, {
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            if (!res.ok) throw new Error('Error al cargar pedidos');
+
+            const data = await res.json();
+            const pedidos = data.data || [];
+            const container = document.getElementById('pendingOrdersContainer');
+
+            if (!pedidos || pedidos.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No hay pedidos pendientes</p>';
+                return;
+            }
+
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 15px;">';
+            pedidos.forEach(pedido => {
+                let itemsHtml = '';
+                if (pedido.items && pedido.items.length > 0) {
+                    itemsHtml = pedido.items.map(item =>
+                        `<li>${item.producto.nombre} (${item.producto.marca}) - Cant: ${item.cantidad} - $${(item.producto.precio * item.cantidad).toFixed(2)}</li>`
+                    ).join('');
+                }
+
+                html += `
+                    <div style="background-color: #1a1520; padding: 15px; border-left: 4px solid #bc2e7e; border-radius: 3px;">
+                        <strong style="font-size: 18px; color: #bc2e7e;">Pedido #${pedido.id}</strong>
+                        <p><strong>Cliente:</strong> ${pedido.cliente.nombre || 'N/A'} ${pedido.cliente.apellido || 'N/A'}</p>
+                        <p><strong>Email:</strong> ${pedido.cliente.email || 'N/A'}</p>
+                        <p><strong>Teléfono:</strong> ${pedido.cliente.telefono || 'N/A'}</p>
+                        <p><strong>Estado:</strong> <span style="color: #bc2e7e; font-weight: bold;">${pedido.estado || 'PENDIENTE'}</span></p>
+                        <p><strong>Forma de pago:</strong> ${pedido.formaPago || 'N/A'}</p>
+                        <p><strong>Domicilio:</strong> ${pedido.domicilioEnvio.calle} ${pedido.domicilioEnvio.numero}, ${pedido.domicilioEnvio.localidad}</p>
+                        <p><strong>Productos:</strong></p>
+                        <ul style="margin: 5px 0; padding-left: 20px;">${itemsHtml}</ul>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('loadingMsg').innerHTML = '❌ Error al cargar pedidos';
+        }
+    }
+
+    async function actualizarEstadoPedido() {
+        const orderId = document.getElementById('updateOrderId').value;
+        const newStatus = document.getElementById('newStatus').value;
+        const msgEl = document.getElementById('updateMessage');
+
+        if (!orderId || !newStatus) {
+            msgEl.innerHTML = '❌ Por favor completa todos los campos';
+            msgEl.style.color = '#ff6b6b';
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API}/pedidos/${orderId}/estado`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ estado: newStatus })
+            });
+
+            if (!res.ok) throw new Error('Error al actualizar');
+
+            msgEl.innerHTML = '✅ Estado actualizado correctamente';
+            msgEl.style.color = '#51cf66';
+            document.getElementById('updateOrderId').value = '';
+            document.getElementById('newStatus').value = '';
+
+            setTimeout(loadPendingOrders, 1000);
+
+        } catch (e) {
+            console.error(e);
+            msgEl.innerHTML = '❌ ' + e.message;
+            msgEl.style.color = '#ff6b6b';
+        }
+    }
+
+    async function cancelOrder() {
+        const orderId = document.getElementById('cancelOrderId').value;
+        const msgEl = document.getElementById('cancelMessage');
+
+        if (!orderId) {
+            msgEl.innerHTML = '❌ Por favor indica el ID del pedido';
+            msgEl.style.color = '#ff6b6b';
+            return;
+        }
+
+        const result = await Swal.fire({
+            title: '¿Cancelar pedido?',
+            text: `Se cancelará el pedido #${orderId}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#881c1c',
+            cancelButtonColor: '#444',
+            confirmButtonText: 'Sí, cancelar',
+            cancelButtonText: 'No',
+            background: '#231932',
+            color: '#ffffff'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const res = await fetch(`${API}/pedidos/${orderId}/cancelar`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ motivo: 'Cancelado por vendedor' })
+            });
+
+            if (!res.ok) throw new Error('Error al cancelar');
+
+            msgEl.innerHTML = '✅ Pedido cancelado correctamente';
+            msgEl.style.color = '#51cf66';
+            document.getElementById('cancelOrderId').value = '';
+
+            setTimeout(loadPendingOrders, 1000);
+
+        } catch (e) {
+            console.error(e);
+            msgEl.innerHTML = '❌ ' + e.message;
+            msgEl.style.color = '#ff6b6b';
+        }
+    }
+
+    loadPendingOrders();
+    setInterval(loadPendingOrders, 30000);
+</script>
+
+</body>
+</html>

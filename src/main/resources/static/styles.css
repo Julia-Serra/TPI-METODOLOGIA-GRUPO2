@@ -603,3 +603,557 @@ form button{
 
     display:inline-block;
 }
+.btn-baja {
+    background-color: #881c1c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.btn-baja:hover {
+    background-color: #b32424;
+}
+
+.admin-page{
+
+    width:1200px;
+
+    margin:auto;
+
+    padding:50px 0;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(350px,1fr));
+
+    gap:30px;
+
+    align-items:start;
+}
+
+.admin-page section{
+
+    background:
+            rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(14px);
+
+    border-radius:28px;
+
+    padding:30px;
+
+    box-shadow:
+            0 10px 30px rgba(0,0,0,0.25);
+
+    transition:0.3s;
+}
+
+.admin-page section:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:
+            0 15px 40px rgba(0,0,0,0.35);
+}
+
+.admin-page h1,
+.admin-page h2{
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+    font-size:30px;
+
+    color:white;
+}
+
+.admin-page form{
+
+    display:flex;
+
+    flex-direction:column;
+}
+
+.admin-page input{
+
+    width:100%;
+
+    padding:15px;
+
+    margin-bottom:15px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:
+            rgba(255,255,255,0.12);
+
+    color:white;
+
+    font-size:15px;
+
+    outline:none;
+}
+
+.admin-page input::placeholder{
+
+    color:#ddd;
+}
+
+.admin-page input[type="file"]{
+
+    padding:12px;
+
+    cursor:pointer;
+}
+
+.admin-page button{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#6c63ff;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.admin-page button:hover{
+
+    background:#574bff;
+
+    transform:scale(1.02);
+}
+
+/* BOTÓN BAJA */
+
+#btnDarDeBaja{
+
+    background:#c62828 !important;
+}
+
+#btnDarDeBaja:hover{
+
+    background:#e53935 !important;
+}
+
+/* MENSAJES */
+
+#msg,
+#msgImagen,
+#msgBaja{
+
+    margin-top:15px;
+
+    text-align:center;
+
+    font-weight:600;
+
+    color:#f5f5f5;
+
+    min-height:24px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1200px){
+
+    .admin-page{
+
+        width:95%;
+    }
+}
+
+@media(max-width:768px){
+
+    .admin-page{
+
+        grid-template-columns:1fr;
+    }
+
+    .admin-page h1,
+    .admin-page h2{
+
+        font-size:24px;
+    }
+}
+
+/* =========================
+   ANIMACIONES GLOBALES
+========================= */
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    animation:fadeBody 0.8s ease;
+}
+
+@keyframes fadeBody{
+
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* =========================
+   EFECTOS GENERALES
+========================= */
+
+button,
+input,
+select,
+textarea,
+.producto-card,
+.hero-card,
+.container-form,
+.admin-login,
+.admin-panel,
+.pedido-box,
+section{
+
+    transition:
+            all 0.3s ease;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+input:focus,
+select:focus,
+textarea:focus{
+
+    outline:none;
+
+    transform:scale(1.02);
+
+    box-shadow:
+            0 0 0 3px rgba(255,79,216,0.25),
+            0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* =========================
+   BOTONES
+========================= */
+
+button{
+
+    transition:
+            transform 0.25s ease,
+            opacity 0.25s ease,
+            background 0.25s ease,
+            box-shadow 0.25s ease;
+}
+
+button:hover{
+
+    transform:
+            translateY(-2px)
+            scale(1.02);
+
+    opacity:0.95;
+
+    box-shadow:
+            0 10px 25px rgba(0,0,0,0.25);
+}
+
+button:active{
+
+    transform:scale(0.97);
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+    transition:0.3s;
+}
+
+.navbar:hover{
+
+    background:
+            rgba(255,255,255,0.12);
+}
+
+.logo{
+
+    transition:0.3s;
+}
+
+.logo:hover{
+
+    transform:scale(1.05);
+
+    color:#ff4fd8;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero-text h1{
+
+    animation:slideLeft 1s ease;
+}
+
+.hero-card{
+
+    animation:slideRight 1s ease;
+}
+
+@keyframes slideLeft{
+
+    from{
+        opacity:0;
+        transform:translateX(-40px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+@keyframes slideRight{
+
+    from{
+        opacity:0;
+        transform:translateX(40px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.producto-card,
+.hero-card,
+.container-form,
+.admin-login,
+.admin-panel,
+.pedido-box,
+.admin-page section{
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+.producto-card::before,
+.hero-card::before,
+.container-form::before,
+.admin-login::before,
+.admin-panel::before,
+.pedido-box::before,
+.admin-page section::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:-100%;
+
+    left:-100%;
+
+    width:250%;
+
+    height:250%;
+
+    background:
+            linear-gradient(
+                    135deg,
+                    transparent,
+                    rgba(255,255,255,0.05),
+                    transparent
+            );
+
+    transform:rotate(25deg);
+
+    transition:0.8s;
+}
+
+.producto-card:hover::before,
+.hero-card:hover::before,
+.container-form:hover::before,
+.admin-login:hover::before,
+.admin-panel:hover::before,
+.pedido-box:hover::before,
+.admin-page section:hover::before{
+
+    top:100%;
+    left:100%;
+}
+
+.producto-card:hover,
+.hero-card:hover,
+.container-form:hover,
+.admin-login:hover,
+.admin-panel:hover,
+.pedido-box:hover,
+.admin-page section:hover{
+
+    transform:
+            translateY(-6px);
+
+    box-shadow:
+            0 15px 35px rgba(0,0,0,0.35);
+}
+
+/* =========================
+   PRODUCTOS
+========================= */
+
+.producto-card img{
+
+    transition:
+            transform 0.4s ease;
+}
+
+.producto-card:hover img{
+
+    transform:scale(1.05);
+}
+
+.precio{
+
+    transition:0.3s;
+}
+
+.producto-card:hover .precio{
+
+    color:#ffffff;
+}
+
+/* =========================
+   LINKS
+========================= */
+
+a{
+
+    transition:0.3s;
+}
+
+a:hover{
+
+    opacity:0.8;
+}
+
+/* =========================
+   TITULOS
+========================= */
+
+h1,h2,h3{
+
+    transition:0.3s;
+}
+
+h1:hover,
+h2:hover,
+h3:hover{
+
+    color:#ff4fd8;
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar{
+
+    width:10px;
+}
+
+::-webkit-scrollbar-track{
+
+    background:#1a1025;
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#6c63ff;
+
+    border-radius:20px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#ff4fd8;
+}
+
+/* =========================
+   SWEET ALERT
+========================= */
+
+.swal2-popup{
+
+    border-radius:25px !important;
+
+    backdrop-filter:blur(15px);
+}
+
+/* =========================
+   APARICIÓN SUAVE
+========================= */
+
+.producto-card,
+.item,
+.pedido-box,
+.admin-page section{
+
+    animation:fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp{
+
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
