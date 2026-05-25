@@ -11,176 +11,51 @@
 
 <body>
 
-<div class="navbar">
+<div class="navbar"></div>
 
-    <div class="logo">
-        👑 Admin Panel
-    </div>
+<div class="admin-page" id="adminPanel">
 
-    <div class="nav-links">
-
-        <a href="index.html">
-            <button>Inicio</button>
-        </a>
-
-        <a href="producto.html">
-            <button>Productos</button>
-        </a>
-
-        <a href="pedidos.html">
-            <button>Pedidos pendientes</button>
-        </a>
-
-    </div>
-
-</div>
-
-<div class="admin-page">
-
-    <div class="admin-login" id="loginBox">
-
-        <h1>Ingreso Administrador</h1>
-
-        <input
-                type="email"
-                id="adminEmail"
-                placeholder="Email admin"
-        >
-
-        <input
-                type="password"
-                id="adminPass"
-                placeholder="Contraseña"
-        >
-
-        <button onclick="loginAdmin()">
-            Ingresar
-        </button>
-
-        <p id="loginMsg"></p>
-
-    </div>
-
-    <div
-            class="admin-panel hidden"
-            id="adminPanel"
-    >
-
+    <section>
         <h1>Crear Producto</h1>
-
         <form id="formProducto">
-
-            <input
-                    id="nombre"
-                    placeholder="Nombre"
-                    required
-            >
-
-            <input
-                    id="marca"
-                    placeholder="Marca"
-                    required
-            >
-
-            <input
-                    id="precio"
-                    type="number"
-                    placeholder="Precio"
-                    required
-            >
-
-            <input
-                    id="stock"
-                    type="number"
-                    placeholder="Stock"
-                    required
-            >
-
-            <button type="submit">
-                Crear Producto
-            </button>
-            <br>
+            <input id="nombre" placeholder="Nombre" required>
+            <input id="marca" placeholder="Marca" required>
+            <input id="precio" type="number" placeholder="Precio" required>
+            <input id="stock" type="number" placeholder="Stock" required>
+            <button type="submit">Crear Producto</button>
         </form>
-
         <p id="msg"></p>
-        
+    </section>
 
-        <h2>Importar imagen a producto</h2>
-
+    <section>
+        <h2>Importar Imagen a Producto</h2>
         <input id="productoIdImagen" type="number" placeholder="ID del producto">
-
         <input id="imagenArchivo" type="file" accept="image/*">
-
         <button id="btnSubirImagen">Subir Imagen</button>
-
         <p id="msgImagen"></p>
+    </section>
 
-
-        <h2>Acciones de Catálogo</h2>
-        
+    <section>
+        <h2>Dar de Baja Producto</h2>
         <input id="productoIdBaja" type="number" placeholder="ID del producto a dar de baja">
-        
         <button id="btnDarDeBaja" onclick="solicitarBajaProducto()" style="background-color: #881c1c; color: white;">
             🗑️ Dar de Baja Producto
         </button>
-        
         <p id="msgBaja"></p>
-
-        <h2>Configurar stock mínimo</h2>
-
-        <input id="productoIdStock" type="number" placeholder="ID producto">
-        <input id="stockMinimo" type="number" placeholder="Stock mínimo">
-
-        <button onclick="setStockMinimo()">
-            Guardar stock mínimo
-        </button>
-
-        <p id="msgStock"></p>
-
-    </div>
+    </section>
 
 </div>
 
+<script src="auth.js"></script>
+<script src="navbar.js"></script>
 <script>
+
+    // Verificar que sea admin
+    requireRole('ADMIN');
 
     const API = "http://localhost:8080";
 
-    let token = "";
-
-    function loginAdmin(){
-
-        const email =
-            document.getElementById("adminEmail").value;
-
-        const pass =
-            document.getElementById("adminPass").value;
-
-        if(
-            email === "admin@bodypaint.com"
-            &&
-            pass === "1234"
-        ){
-
-            token =
-                "Basic " + btoa(email + ":" + pass);
-
-            console.log(token);
-
-            document
-                .getElementById("loginBox")
-                .classList.add("hidden");
-
-            document
-                .getElementById("adminPanel")
-                .classList.remove("hidden");
-
-        }else{
-
-            document.getElementById("loginMsg")
-                .innerHTML =
-                "❌ Credenciales incorrectas";
-        }
-    }
+    let token = getCurrentToken();
 
     document
         .getElementById("formProducto")
@@ -289,19 +164,24 @@
                     body: formData
                 });
 
+            const data = await res.json();
+
             if (!res.ok) {
                 msg.innerHTML =
-                    "❌ Error al subir imagen";
+                    "❌ " + (data.message || "Error al subir imagen");
                 return;
             }
 
             msg.innerHTML =
                 "✅ Imagen subida correctamente";
 
-        } catch (e) {
+            document.getElementById("productoIdImagen").value = "";
+            document.getElementById("imagenArchivo").value = "";
 
+        } catch (e) {
+            console.error(e);
             msg.innerHTML =
-                "❌ Error de conexión";
+                "❌ Error de conexión: " + e.message;
         }
     });
 
@@ -393,33 +273,7 @@
             }
         }
     }
-    async function setStockMinimo(){
 
-        const id = document.getElementById("productoIdStock").value;
-        const stockMin = document.getElementById("stockMinimo").value;
-
-        if(!id || stockMin === ""){
-            Swal.fire("Error","Datos incompletos","error");
-            return;
-        }
-
-        const res = await fetch(`${API}/api/productos/${id}/stock-minimo`, {
-            method:"PUT",
-            headers:{
-                "Content-Type":"application/json",
-                "Authorization": token
-            },
-            body: JSON.stringify({
-                stockMinimo: parseInt(stockMin)
-            })
-        });
-
-        if(res.ok){
-            Swal.fire("OK","Stock mínimo actualizado","success");
-        }else{
-            Swal.fire("Error","No se pudo actualizar","error");
-        }
-    }
 </script>
 
 </body>

@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,8 +38,10 @@ public class Pedido {
     private Cliente cliente;
 
     @OneToMany(
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            mappedBy = "pedido"
     )
+    @Default
     private List <ItemCarrito> items = new ArrayList<>();
 
     @Embedded

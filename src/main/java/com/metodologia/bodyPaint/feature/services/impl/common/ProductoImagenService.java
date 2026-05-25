@@ -30,10 +30,6 @@ public class ProductoImagenService implements IProductoImagenService {
         Producto producto = productoRepository.findById(productoId)
                 .orElseThrow(() -> new BadRequestException("Producto no encontrado"));
 
-        if (producto.getImagen() != null) {
-            throw new BadRequestException("El producto ya posee una imagen asociada");
-        }
-
         if (request.getArchivo() == null || request.getArchivo().isEmpty()) {
             throw new BadRequestException("Debe enviar una imagen");
         }

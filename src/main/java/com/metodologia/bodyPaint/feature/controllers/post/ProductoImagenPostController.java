@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.metodologia.bodyPaint.config.BaseResponse;
 import com.metodologia.bodyPaint.feature.dtos.request.ImportarImagenRequest;
 import com.metodologia.bodyPaint.feature.services.interfaces.common.IProductoImagenService;
 
@@ -23,10 +24,11 @@ public class ProductoImagenPostController {
         value = "/{id}/imagen",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public void importarImagen(
+    public BaseResponse<Void> importarImagen(
             @PathVariable Long id,
             @ModelAttribute ImportarImagenRequest request
     ) {
         productoImagenService.importarImagen(id, request);
+        return BaseResponse.ok(null, "Imagen importada correctamente");
     }
 }

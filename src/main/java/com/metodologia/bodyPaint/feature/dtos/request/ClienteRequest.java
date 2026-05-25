@@ -31,6 +31,10 @@ public class ClienteRequest {
     @NotBlank(message = "El email es obligatorio")
     private String email;
 
+    @NotBlank(message = "Por favor ingrese una contraseña")
+    @Size(min = 4, message = "La contraseña debe tener al menos 4 caracteres")
+    private String password;
+
     @NotBlank(message = "Por favor ingrese un país")
     @Pattern(
             regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$",

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | BodyPaint</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background-color: #231932;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-container h1 {
+            text-align: center;
+            color: #bc2e7e;
+            margin-bottom: 30px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .auth-form input {
+            padding: 12px;
+            border: 1px solid #bc2e7e;
+            border-radius: 5px;
+            background-color: #2a1f35;
+            color: white;
+            font-size: 14px;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 5px rgba(255, 105, 180, 0.5);
+        }
+
+        .auth-form button {
+            padding: 12px;
+            background-color: #bc2e7e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .auth-form button:hover {
+            background-color: #ff69b4;
+        }
+
+        .auth-message {
+            text-align: center;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+
+        .auth-message.error {
+            color: #ff6b6b;
+        }
+
+        .auth-message.success {
+            color: #51cf66;
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .auth-toggle a {
+            color: #bc2e7e;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .auth-toggle a:hover {
+            color: #ff69b4;
+        }
+
+        .hidden-form {
+            display: none;
+        }
+
+        .demo-users {
+            background-color: #2a1f35;
+            border: 1px solid #bc2e7e;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .demo-users h3 {
+            color: #bc2e7e;
+            margin-top: 0;
+        }
+
+        .demo-users p {
+            margin: 5px 0;
+        }
+
+        .demo-user-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: 5px;
+        }
+
+        .demo-user-btn:hover {
+            background-color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">🎨 BodyPaint</div>
+    <div class="nav-links">
+        <a href="index.html"><button>Inicio</button></a>
+        <a href="producto.html"><button>Productos</button></a>
+    </div>
+</div>
+
+<div class="auth-container">
+    <!-- Formulario de Login -->
+    <div id="loginForm" class="auth-form">
+        <h1>Ingresar</h1>
+        <input type="email" id="loginEmail" placeholder="Email">
+        <input type="password" id="loginPassword" placeholder="Contraseña">
+        <button onclick="handleLogin()">Login</button>
+        <p class="auth-message" id="loginMessage"></p>
+        <div class="auth-toggle">
+            ¿No tienes cuenta? <a onclick="toggleForms()">Registrarse aquí</a>
+        </div>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div id="registerForm" class="auth-form hidden-form">
+        <h1>Registrarse</h1>
+        <div style="max-height: 400px; overflow-y: auto;">
+            <input type="text" id="registerNombre" placeholder="Nombre" required>
+            <input type="text" id="registerApellido" placeholder="Apellido" required>
+            <input type="email" id="registerEmail" placeholder="Email" required>
+            <input type="password" id="registerPassword" placeholder="Contraseña" required>
+            <input type="password" id="registerConfirmPassword" placeholder="Confirmar contraseña" required>
+            <input type="text" id="registerPais" placeholder="País" required>
+            <input type="text" id="registerProvincia" placeholder="Provincia" required>
+            <input type="text" id="registerLocalidad" placeholder="Localidad" required>
+            <input type="text" id="registerCalle" placeholder="Calle" required>
+            <input type="text" id="registerNumero" placeholder="Número de calle" required>
+            <input type="text" id="registerPiso" placeholder="Piso (opcional)">
+            <input type="text" id="registerDepartamento" placeholder="Departamento (opcional)">
+        </div>
+        <button onclick="handleRegister()">Registrarse</button>
+        <p class="auth-message" id="registerMessage"></p>
+        <div class="auth-toggle">
+            ¿Ya tienes cuenta? <a onclick="toggleForms()">Ingresar aquí</a>
+        </div>
+    </div>
+
+    <!-- Usuarios de Demostración -->
+    <div class="demo-users">
+        <h3>👤 Usuarios de Prueba</h3>
+        <p><strong>Admin:</strong> admin@bodypaint.com / 1234</p>
+        <button class="demo-user-btn" onclick="fillDemoUser('admin@bodypaint.com', '1234')">Usar Admin</button>
+        <br>
+        <p><strong>Cliente:</strong> cliente@bodypaint.com / 1234</p>
+        <button class="demo-user-btn" onclick="fillDemoUser('cliente@bodypaint.com', '1234')">Usar Cliente</button>
+        <br>
+        <p><strong>Vendedor:</strong> vendedor@bodypaint.com / 1234</p>
+        <button class="demo-user-btn" onclick="fillDemoUser('vendedor@bodypaint.com', '1234')">Usar Vendedor</button>
+    </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+    // Verificar si ya está autenticado
+    if (isAuthenticated()) {
+        const role = getCurrentRole();
+        if (role === 'CLIENTE') {
+            window.location.href = '/index.html';
+        } else if (role === 'ADMIN') {
+            window.location.href = '/admin.html';
+        } else if (role === 'VENDEDOR') {
+            window.location.href = '/vendedor.html';
+        }
+    }
+
+    // Verificar si debe mostrar registro
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'register') {
+        toggleForms();
+    }
+
+    function toggleForms() {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        
+        loginForm.classList.toggle('hidden-form');
+        registerForm.classList.toggle('hidden-form');
+        
+        // Limpiar mensajes
+        document.getElementById('loginMessage').textContent = '';
+        document.getElementById('registerMessage').textContent = '';
+    }
+
+    function handleLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const messageEl = document.getElementById('loginMessage');
+
+        if (!email || !password) {
+            messageEl.textContent = '❌ Por favor completa todos los campos';
+            messageEl.className = 'auth-message error';
+            return;
+        }
+
+        const result = login(email, password);
+        
+        if (result.success) {
+            messageEl.textContent = '✅ Autenticación exitosa, redirigiendo...';
+            messageEl.className = 'auth-message success';
+            
+            setTimeout(() => {
+                if (result.role === 'CLIENTE') {
+                    window.location.href = '/index.html';
+                } else if (result.role === 'ADMIN') {
+                    window.location.href = '/admin.html';
+                } else if (result.role === 'VENDEDOR') {
+                    window.location.href = '/vendedor.html';
+                }
+            }, 1000);
+        } else {
+            messageEl.textContent = '❌ ' + result.message;
+            messageEl.className = 'auth-message error';
+        }
+    }
+
+    function handleRegister() {
+        const nombre = document.getElementById('registerNombre').value.trim();
+        const apellido = document.getElementById('registerApellido').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('registerConfirmPassword').value;
+        const pais = document.getElementById('registerPais').value.trim();
+        const provincia = document.getElementById('registerProvincia').value.trim();
+        const localidad = document.getElementById('registerLocalidad').value.trim();
+        const calle = document.getElementById('registerCalle').value.trim();
+        const numero = document.getElementById('registerNumero').value.trim();
+        const piso = document.getElementById('registerPiso').value.trim();
+        const departamento = document.getElementById('registerDepartamento').value.trim();
+
+        const messageEl = document.getElementById('registerMessage');
+
+        // Validaciones básicas
+        if (!nombre || !apellido || !email || !password || !confirmPassword || !pais || !provincia || !localidad || !calle || !numero) {
+            messageEl.textContent = '❌ Por favor completa todos los campos obligatorios';
+            messageEl.className = 'auth-message error';
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            messageEl.textContent = '❌ Las contraseñas no coinciden';
+            messageEl.className = 'auth-message error';
+            return;
+        }
+
+        if (password.length < 4) {
+            messageEl.textContent = '❌ La contraseña debe tener al menos 4 caracteres';
+            messageEl.className = 'auth-message error';
+            return;
+        }
+
+        // Enviar datos al backend
+        const clienteData = {
+            nombre,
+            apellido,
+            email,
+            password,
+            pais,
+            provincia,
+            localidad,
+            calle,
+            numero,
+            piso: piso || null,
+            departamento: departamento || null
+        };
+
+        const API = "http://localhost:8080";
+
+        fetch(`${API}/clientes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(clienteData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data || data.message === 'Cliente creado') {
+                // Ahora hacer login con el cliente creado
+                messageEl.textContent = '✅ Registro exitoso, iniciando sesión...';
+                messageEl.className = 'auth-message success';
+
+                // Agregar usuario dinámicamente al sistema de autenticación
+                addUser(email, password, 'CLIENTE');
+
+                // Crear sesión local
+                const session = {
+                    email: email,
+                    role: 'CLIENTE',
+                    token: 'Bearer ' + btoa(email + ':' + password),
+                    loginTime: new Date().toISOString()
+                };
+
+                sessionStorage.setItem('auth_session', JSON.stringify(session));
+
+                setTimeout(() => {
+                    window.location.href = '/index.html';
+                }, 1000);
+            } else {
+                messageEl.textContent = '❌ ' + (data.message || 'Error al registrar');
+                messageEl.className = 'auth-message error';
+            }
+        })
+        .catch(e => {
+            console.error(e);
+            messageEl.textContent = '❌ Error de conexión con el servidor';
+            messageEl.className = 'auth-message error';
+        });
+    }
+
+    function fillDemoUser(email, password) {
+        document.getElementById('loginEmail').value = email;
+        document.getElementById('loginPassword').value = password;
+    }
+
+    // Permitir Enter en inputs
+    document.getElementById('loginEmail').addEventListener('keypress', e => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    document.getElementById('loginPassword').addEventListener('keypress', e => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    document.getElementById('registerConfirmPassword').addEventListener('keypress', e => {
+        if (e.key === 'Enter') handleRegister();
+    });
+</script>
+
+</body>
+</html>

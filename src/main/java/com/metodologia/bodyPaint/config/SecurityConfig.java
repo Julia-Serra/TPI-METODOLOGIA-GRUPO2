@@ -60,7 +60,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(ClienteRepository clienteRepository) {
         return email -> {
-            Cliente cliente = clienteRepository.findByEmail(email)
+            Cliente cliente = clienteRepository.findByEmailIgnoreCase(email)
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
             return org.springframework.security.core.userdetails.User
