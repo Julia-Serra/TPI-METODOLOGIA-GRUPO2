@@ -57,11 +57,9 @@ async function cargarPedidos() {
                     </ul>
             
                     <select id="estado-${pedido.id}">
-                        <option value="PENDIENTE_PREPARACION">PENDIENTE PREPARACION</option>
-                        <option value="CONFIRMADO">CONFIRMADO</option>
                         <option value="LISTO">LISTO</option>
-                        <option value="ENTREGADO_POR_CORRERO">ENTREGADO POR CORREO</option>
-                        <option value="CANCELADO">CANCELADO</option>
+                        <option value="RETIRADO_POR_CORREO">RETIRADO POR CORREO</option>
+                        <option value="ENTREGADO">ENTREGADO</option>
                     </select>
             
                     <button onclick="actualizarEstado(${pedido.id})">
@@ -99,30 +97,49 @@ async function actualizarEstado(idPedido) {
         document.getElementById(`estado-${idPedido}`).value;
 
     if (!estado) {
-        alert("Seleccione un estado");
+
+        Swal.fire({
+            title: 'Error',
+            text: 'Seleccione un estado',
+            icon: 'error'
+        });
+
         return;
     }
 
     try {
 
         const res = await fetch(
-            `${API}/pedidos/${idPedido}/estado?estado=${estado}`,
+            `${API}/pedidos/${idPedido}/estado`,
             {
-                method: "PUT"
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    estado: estado
+                })
             }
         );
 
-        const data = await res.json();
-
         if (!res.ok) {
+
+            let mensaje = "No se pudo actualizar";
+
+            try {
+                const errorData = await res.json();
+                mensaje = errorData.message || mensaje;
+            } catch (e) {}
+
             Swal.fire({
                 title: 'Error',
-                text: data.message || "No se pudo actualizar",
+                text: mensaje,
                 icon: 'error',
                 confirmButtonColor: '#bc2e7e',
                 background: '#231932',
                 color: '#ffffff'
             });
+
             return;
         }
 
@@ -138,6 +155,8 @@ async function actualizarEstado(idPedido) {
         cargarPedidos();
 
     } catch (error) {
+
+        console.error(error);
 
         Swal.fire({
             title: 'Error',
