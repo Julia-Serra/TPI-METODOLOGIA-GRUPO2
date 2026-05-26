@@ -1,6 +1,8 @@
 package com.metodologia.bodyPaint.feature.controllers.get;
 
 import com.metodologia.bodyPaint.feature.models.Producto;
+import com.metodologia.bodyPaint.feature.dtos.response.ProductoResponse;
+import com.metodologia.bodyPaint.feature.mappers.ProductoMapper;
 import com.metodologia.bodyPaint.feature.services.impl.domain.ProductoFiltroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +20,7 @@ public class ProductoFiltroController {
     private final ProductoFiltroService productoFiltroService;
 
     @GetMapping("/buscar")
-    public List<Producto> buscar(
+    public List<ProductoResponse> buscar(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String marca,
             @RequestParam(required = false) Double precioMin,
@@ -27,7 +29,7 @@ public class ProductoFiltroController {
             @RequestParam(required = false) Integer stockMax
     ) {
 
-        return productoFiltroService.filtrar(
+        List<Producto> productos = productoFiltroService.filtrar(
                 nombre,
                 marca,
                 precioMin,
@@ -35,5 +37,9 @@ public class ProductoFiltroController {
                 stockMin,
                 stockMax
         );
+
+        return productos.stream()
+                .map(ProductoMapper::toResponse)
+                .toList();
     }
 }
