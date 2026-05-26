@@ -36,6 +36,14 @@
     </section>
 
     <section>
+        <h2>Configurar Stock Mínimo</h2>
+        <input id="productoIdStockMinimo" type="number" placeholder="ID del producto">
+        <input id="stockMinimoValor" type="number" placeholder="Stock mínimo" min="0" required>
+        <button id="btnConfigurarStockMinimo">Configurar Stock Mínimo</button>
+        <p id="msgStockMinimo"></p>
+    </section>
+
+    <section>
         <h2>Dar de Baja Producto</h2>
         <input id="productoIdBaja" type="number" placeholder="ID del producto a dar de baja">
         <button id="btnDarDeBaja" onclick="solicitarBajaProducto()" style="background-color: #881c1c; color: white;">
@@ -177,6 +185,63 @@
 
             document.getElementById("productoIdImagen").value = "";
             document.getElementById("imagenArchivo").value = "";
+
+        } catch (e) {
+            console.error(e);
+            msg.innerHTML =
+                "❌ Error de conexión: " + e.message;
+        }
+    });
+
+
+    document
+    .getElementById("btnConfigurarStockMinimo")
+    .addEventListener("click", async () => {
+
+        const id =
+            document.getElementById("productoIdStockMinimo").value;
+
+        const stockMinimo =
+            document.getElementById("stockMinimoValor").value;
+
+        const msg =
+            document.getElementById("msgStockMinimo");
+
+        if (!id || stockMinimo === "") {
+            msg.innerHTML =
+                "❌ Debe indicar ID del producto y stock mínimo";
+            return;
+        }
+
+        const request = {
+            stockMinimo: parseInt(stockMinimo)
+        };
+
+        try {
+
+            const res =
+                await fetch(`${API}/api/productos/${id}/stock-minimo`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": token
+                    },
+                    body: JSON.stringify(request)
+                });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                msg.innerHTML =
+                    "❌ " + (data.message || "Error al configurar stock mínimo");
+                return;
+            }
+
+            msg.innerHTML =
+                "✅ Stock mínimo configurado correctamente";
+
+            document.getElementById("productoIdStockMinimo").value = "";
+            document.getElementById("stockMinimoValor").value = "";
 
         } catch (e) {
             console.error(e);
