@@ -37,7 +37,6 @@
                 </select>
                 <button onclick="actualizarEstadoPedido()" style="padding: 8px 15px; background-color: #bc2e7e; color: white; border: none; border-radius: 5px; cursor: pointer;">Actualizar</button>
             </div>
-            <p id="updateMessage" style="margin-top: 10px; min-height: 20px;"></p>
         </div>
 
         <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
@@ -46,13 +45,25 @@
                 <input type="number" id="cancelOrderId" placeholder="ID del pedido a cancelar" style="padding: 8px; border: 1px solid #bc2e7e; border-radius: 5px; background-color: #2a1f35; color: white;">
                 <button onclick="cancelOrder()" style="padding: 8px 15px; background-color: #881c1c; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancelar Pedido</button>
             </div>
-            <p id="cancelMessage" style="margin-top: 10px; min-height: 20px;"></p>
         </div>
 
         <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
             <h3>Reclamos</h3>
             <div id="claimsContainer" style="background-color: #2a1f35; padding: 15px; border-radius: 5px;">
                 <p id="loadingClaimsMsg">No hay reclamos en este momento</p>
+            </div>
+        </div>
+
+        <div style="margin: 30px 0; border-top: 2px solid #444; padding-top: 20px;">
+            <h3>Reportes Operativos</h3>
+            <div style="background-color: #2a1f35; padding: 20px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+                <div>
+                    <h4 style="margin: 0 0 5px 0; color: #bc2e7e; font-size: 16px;">Ranking de Productos Más Vendidos</h4>
+                    <p style="margin: 0; color: #b3b3b3; font-size: 14px;">Consulte las estadísticas mensuales y anuales de salida de productos para optimizar las existencias y la logística operativa.</p>
+                </div>
+                <a href="reporte-vendedor.html" style="padding: 10px 20px; background-color: #bc2e7e; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; white-space: nowrap; text-align: center; display: inline-block;">
+                    📊 Ver Reporte
+                </a>
             </div>
         </div>
 
@@ -121,11 +132,16 @@
     async function actualizarEstadoPedido() {
         const orderId = document.getElementById('updateOrderId').value;
         const newStatus = document.getElementById('newStatus').value;
-        const msgEl = document.getElementById('updateMessage');
 
         if (!orderId || !newStatus) {
-            msgEl.innerHTML = '❌ Por favor completa todos los campos';
-            msgEl.style.color = '#ff6b6b';
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos incompletos',
+                text: 'Por favor completa todos los campos para actualizar.',
+                background: '#231932',
+                color: '#ffffff',
+                confirmButtonColor: '#bc2e7e'
+            });
             return;
         }
 
@@ -139,10 +155,17 @@
                 body: JSON.stringify({ estado: newStatus })
             });
 
-            if (!res.ok) throw new Error('Error al actualizar');
+            if (!res.ok) throw new Error('Error al actualizar el estado del pedido.');
 
-            msgEl.innerHTML = '✅ Estado actualizado correctamente';
-            msgEl.style.color = '#51cf66';
+            Swal.fire({
+                icon: 'success',
+                title: '¡Estado Actualizado!',
+                text: `El pedido #${orderId} cambió a ${newStatus} correctamente.`,
+                background: '#231932',
+                color: '#ffffff',
+                confirmButtonColor: '#bc2e7e'
+            });
+
             document.getElementById('updateOrderId').value = '';
             document.getElementById('newStatus').value = '';
 
@@ -150,18 +173,29 @@
 
         } catch (e) {
             console.error(e);
-            msgEl.innerHTML = '❌ ' + e.message;
-            msgEl.style.color = '#ff6b6b';
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: e.message,
+                background: '#231932',
+                color: '#ffffff',
+                confirmButtonColor: '#bc2e7e'
+            });
         }
     }
 
     async function cancelOrder() {
         const orderId = document.getElementById('cancelOrderId').value;
-        const msgEl = document.getElementById('cancelMessage');
 
         if (!orderId) {
-            msgEl.innerHTML = '❌ Por favor indica el ID del pedido';
-            msgEl.style.color = '#ff6b6b';
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: 'Por favor indica el ID del pedido a cancelar.',
+                background: '#231932',
+                color: '#ffffff',
+                confirmButtonColor: '#bc2e7e'
+            });
             return;
         }
 
@@ -190,23 +224,36 @@
                 body: JSON.stringify({ motivo: 'Cancelado por vendedor' })
             });
 
-            if (!res.ok) throw new Error('Error al cancelar');
+            if (!res.ok) throw new Error('No se pudo cancelar el pedido elegido.');
 
-            msgEl.innerHTML = '✅ Pedido cancelado correctamente';
-            msgEl.style.color = '#51cf66';
+            Swal.fire({
+                icon: 'success',
+                title: 'Pedido Cancelado',
+                text: `El pedido #${orderId} fue cancelado con éxito.`,
+                background: '#231932',
+                color: '#ffffff',
+                confirmButtonColor: '#bc2e7e'
+            });
+
             document.getElementById('cancelOrderId').value = '';
 
             setTimeout(loadPendingOrders, 1000);
 
         } catch (e) {
             console.error(e);
-            msgEl.innerHTML = '❌ ' + e.message;
-            msgEl.style.color = '#ff6b6b';
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: e.message,
+                background: '#231932',
+                color: '#ffffff',
+                confirmButtonColor: '#bc2e7e'
+            });
         }
     }
 
     loadPendingOrders();
-    setInterval(loadPendingOrders, 30000);
+    setInterval(loadPendingOrders, 30000);  
 </script>
 
 </body>
