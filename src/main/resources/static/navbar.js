@@ -34,6 +34,7 @@ function renderNavbar() {
       <a href="/index.html"><button>Inicio</button></a>
       <a href="/admin.html"><button>Admin</button></a>
       <a href="/producto.html"><button>Productos</button></a>
+      <a href="/reporte-stock.html"><button>Reporte Stock</button></a>
       <button onclick="logout()" style="background-color: #881c1c; color: white;">Logout</button>
     `;
   } else if (session.role === 'VENDEDOR') {
