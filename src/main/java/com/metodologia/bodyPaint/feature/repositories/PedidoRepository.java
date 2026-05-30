@@ -23,11 +23,12 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
            "FROM Pedido ped " +
            "JOIN ped.items i " +
            "JOIN i.producto p " +
-           "WHERE (:mes IS NULL OR MONTH(ped.fecha) = :mes) " +
+           "WHERE ped.estado = 'ENTREGADO' " +
+           "AND (:mes IS NULL OR MONTH(ped.fecha) = :mes) " +
            "AND (:anio IS NULL OR YEAR(ped.fecha) = :anio) " +
            "GROUP BY p.id, p.nombre, p.marca " +
            "ORDER BY SUM(i.cantidad) DESC")
     List<ReporteProductoMasVendidoResponse> obtenerProductosMasVendidos(
-            @Param("mes") Integer mes,  
+            @Param("mes") Integer mes,
             @Param("anio") Integer anio);
 }

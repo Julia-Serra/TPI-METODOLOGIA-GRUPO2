@@ -71,6 +71,13 @@
             outline: none;
         }
 
+        .filter-group small {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: #999;
+        }
+
         .btn-generate {
             padding: 12px 25px;
             background-color: #bc2e7e;
@@ -123,7 +130,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .custom-table td:first-child { border-left: 3px solid #bc2e7e; border-radius: 5px 0 0 5px; }
+        .custom-table td:first-child { border-left: 3px solid #bc2e7e; border-radius: 5px 0 0 5px; background-color: rgba(188, 46, 126, 0.1); text-align: center; }
         .custom-table td:last-child { border-radius: 0 5px 5px 0; }
 
         .badge-quantity {
@@ -155,10 +162,12 @@
         <div class="filter-group">
             <label for="filterAnio">AÑO</label>
             <input type="number" id="filterAnio" placeholder="Ej: 2026" min="2000" max="2099">
+            <small style="color: #888; font-size: 0.8rem; margin-top: 3px;">Opcional. Deja en blanco para todos los años</small>
         </div>
         <div class="filter-group">
             <label for="filterMes">MES</label>
             <input type="number" id="filterMes" placeholder="1-12" min="1" max="12">
+            <small style="color: #888; font-size: 0.8rem; margin-top: 3px;">Opcional. Requiere año para funcionar</small>
         </div>
         <button id="btnGenerar" class="btn-generate">
             📊 GENERAR REPORTE
@@ -168,6 +177,7 @@
     <table class="custom-table">
         <thead>
             <tr>
+                <th>POSICIÓN</th>
                 <th>ID</th>
                 <th>PRODUCTO</th>
                 <th>MARCA</th>
@@ -176,7 +186,7 @@
         </thead>
         <tbody id="tablaReporteBody">
             <tr>
-                <td colspan="4" class="empty-msg">
+                <td colspan="5" class="empty-msg">
                     Esperando selección de filtros...
                 </td>
             </tr>
