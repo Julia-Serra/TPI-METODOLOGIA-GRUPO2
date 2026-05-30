@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking de Ventas | BodyPaint</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1520 0%, #231932 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .report-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: rgba(35, 25, 50, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(188, 46, 126, 0.2);
+        }
+
+        h2 {
+            color: #ffffff;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            border-left: 5px solid #bc2e7e;
+            padding-left: 15px;
+        }
+
+        .subtitle {
+            color: #b3b3b3;
+            margin-bottom: 30px;
+        }
+
+        .filters-panel {
+            background-color: #2a1f35;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            border: 1px solid #444;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: bold;
+            color: #bc2e7e;
+            font-size: 0.9rem;
+        }
+
+        .filter-group input {
+            padding: 10px;
+            border: 1px solid #bc2e7e;
+            border-radius: 5px;
+            background-color: #1a1520;
+            color: white;
+            width: 120px;
+            outline: none;
+        }
+
+        .filter-group small {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .btn-generate {
+            padding: 12px 25px;
+            background-color: #bc2e7e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-generate:hover {
+            background-color: #e040fb;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(224, 64, 251, 0.4);
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-top: 20px;
+        }
+
+        .custom-table th {
+            background-color: transparent;
+            color: #bc2e7e;
+            text-align: left;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #444;
+        }
+
+        .custom-table tr.data-row {
+            background-color: #1a1520;
+            transition: all 0.3s;
+        }
+
+        .custom-table tr.data-row:hover {
+            transform: scale(1.01);
+            background-color: #2a1f35;
+        }
+
+        .custom-table td {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .custom-table td:first-child { border-left: 3px solid #bc2e7e; border-radius: 5px 0 0 5px; background-color: rgba(188, 46, 126, 0.1); text-align: center; }
+        .custom-table td:last-child { border-radius: 0 5px 5px 0; }
+
+        .badge-quantity {
+            background-color: rgba(46, 125, 50, 0.2);
+            color: #69f0ae;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 1px solid #2e7d32;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 50px;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar"></div>
+
+<div class="report-container">
+    <h2>Ranking de Productos Más Vendidos</h2>
+    <p class="subtitle">Análisis de stock operativo y rendimiento de ventas mensual/anual.</p>
+    
+    <div class="filters-panel">
+        <div class="filter-group">
+            <label for="filterAnio">AÑO</label>
+            <input type="number" id="filterAnio" placeholder="Ej: 2026" min="2000" max="2099">
+            <small style="color: #888; font-size: 0.8rem; margin-top: 3px;">Opcional. Deja en blanco para todos los años</small>
+        </div>
+        <div class="filter-group">
+            <label for="filterMes">MES</label>
+            <input type="number" id="filterMes" placeholder="1-12" min="1" max="12">
+            <small style="color: #888; font-size: 0.8rem; margin-top: 3px;">Opcional. Requiere año para funcionar</small>
+        </div>
+        <button id="btnGenerar" class="btn-generate">
+            📊 GENERAR REPORTE
+        </button>
+    </div>
+
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>POSICIÓN</th>
+                <th>ID</th>
+                <th>PRODUCTO</th>
+                <th>MARCA</th>
+                <th>CANTIDAD VENDIDA</th>
+            </tr>
+        </thead>
+        <tbody id="tablaReporteBody">
+            <tr>
+                <td colspan="5" class="empty-msg">
+                    Esperando selección de filtros...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="auth.js"></script>
+<script src="navbar.js"></script>
+<script src="reporte-vendedor.js"></script>
+</body>
+</html>

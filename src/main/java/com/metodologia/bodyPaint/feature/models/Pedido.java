@@ -5,6 +5,8 @@ import com.metodologia.bodyPaint.config.exceptions.BadRequestException;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.persistence.Embedded;
@@ -53,6 +55,8 @@ public class Pedido {
     private EstadoPedido estado;
 
     private String motivoCancelacion;
+
+    private LocalDate fecha;
 
     public void cancelar(String motivo) {
 
