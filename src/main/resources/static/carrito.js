@@ -2,7 +2,8 @@ const API = "http://localhost:8080";
 let clienteActual = null;
 
 let carritoId = localStorage.getItem("carritoId");
-
+let cuponAplicado = null;
+let descuentoAplicado = 0;
 async function iniciar(){
 
     if(!carritoId){
@@ -100,8 +101,19 @@ async function cargar(){
         `;
     });
 
+    let totalFinal =
+        carrito.total;
+
+    if(descuentoAplicado > 0){
+
+        totalFinal =
+            carrito.total -
+            descuentoAplicado;
+    }
+
     document.getElementById("total")
-        .innerHTML = `Total: $${carrito.total}`;
+        .innerHTML =
+        `Total: $${totalFinal}`;
 }
 
 async function modificar(productoId,cantidad){
@@ -173,6 +185,12 @@ async function vaciar(){
         color: '#ffffff',
         timer: 1500
     });
+    cuponAplicado = null;
+    descuentoAplicado = 0;
+
+    document.getElementById(
+        "descuentoAplicado"
+    ).innerHTML = "";
 
     cargar();
 }
@@ -270,6 +288,9 @@ async function buscarCliente() {
         cargarDirecciones(
             clienteActual.direcciones || []
         );
+        await cargarCupones(
+            clienteActual.email
+        );
 
         alert("✅ Cliente encontrado: " + clienteActual.nombre + " " + clienteActual.apellido);
 
@@ -299,4 +320,147 @@ function cargarDirecciones(direcciones){
 
         select.appendChild(option);
     });
+}
+async function cargarCupones(email){
+
+    try{
+
+        const response =
+            await fetch(
+                `${API}/cupones/cliente/${email}`
+            );
+
+        const cupones =
+            await response.json();
+
+        const select =
+            document.getElementById(
+                "cuponSelect"
+            );
+
+        select.innerHTML =
+            `<option value="">
+                Seleccione un cupón
+            </option>`;
+
+        cupones.forEach(cupon => {
+
+            select.innerHTML += `
+                <option value="${cupon.codigo}">
+                    ${cupon.codigo}
+                </option>
+            `;
+        });
+
+    }catch(error){
+
+        console.error(error);
+    }
+}
+async function aplicarCupon(){
+
+    const codigo =
+        document.getElementById(
+            "cuponSelect"
+        ).value;
+
+    if(!codigo){
+
+        Swal.fire({
+            icon:"warning",
+            title:"Seleccione un cupón"
+        });
+
+        return;
+    }
+
+    const totalTexto =
+        document.getElementById("total")
+            .innerText;
+
+    const total =
+        parseFloat(
+            totalTexto.replace("Total: $","")
+        );
+
+    try{
+
+        const response =
+            await fetch(
+                `${API}/cupones/aplicar`,
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({
+                        emailCliente:
+                            clienteActual.email,
+                        codigoCupon:
+                            codigo,
+                        total:
+                            total
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if(!response.ok){
+
+            Swal.fire({
+                icon:"error",
+                title:
+                    data.message ||
+                    "No se pudo aplicar el cupón"
+            });
+
+            return;
+        }
+
+        cuponAplicado =
+            data.codigoCupon;
+
+        descuentoAplicado =
+            data.descuentoAplicado;
+
+        document
+            .getElementById(
+                "descuentoAplicado"
+            )
+            .innerHTML =
+            `
+            <p>
+                Cupón: ${data.codigoCupon}
+            </p>
+
+            <p>
+                Descuento: $${data.descuentoAplicado}
+            </p>
+
+            <p>
+                Total Final: $${data.totalFinal}
+            </p>
+            `;
+
+        document.getElementById("total")
+            .innerHTML =
+            `Total: $${data.totalFinal}`;
+
+        Swal.fire({
+            icon:"success",
+            title:"Cupón aplicado correctamente"
+        });
+
+    }catch(error){
+
+        console.error(error);
+
+        Swal.fire({
+            icon:"error",
+            title:"Error",
+            text:error.message
+        });
+    }
 }

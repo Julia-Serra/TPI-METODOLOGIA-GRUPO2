@@ -1,12 +1,12 @@
 package com.metodologia.bodyPaint.feature.services.impl.domain;
 
 import com.metodologia.bodyPaint.config.exceptions.BadRequestException;
-import com.metodologia.bodyPaint.feature.dtos.CuponDescuentoRepository;
 import com.metodologia.bodyPaint.feature.dtos.request.GenerarCuponRequest;
 import com.metodologia.bodyPaint.feature.dtos.response.GenerarCuponResponse;
 import com.metodologia.bodyPaint.feature.models.Cliente;
 import com.metodologia.bodyPaint.feature.models.CuponDescuento;
 import com.metodologia.bodyPaint.feature.repositories.ClienteRepository;
+import com.metodologia.bodyPaint.feature.repositories.CuponDescuentoRepository;
 import com.metodologia.bodyPaint.feature.services.interfaces.domain.IGenerarCuponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

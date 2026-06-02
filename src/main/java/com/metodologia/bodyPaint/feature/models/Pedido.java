@@ -79,4 +79,11 @@ public class Pedido {
         }
         this.estado = nuevoEstado;
     }
+    public double getTotal() {
+
+        return items.stream()
+                .mapToDouble(i ->
+                        i.getProducto().getPrecio() * i.getCantidad())
+                .sum();
+    }
 }
