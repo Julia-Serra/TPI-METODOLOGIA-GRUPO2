@@ -67,9 +67,64 @@
             </div>
         </div>
 
+        <!-- CUPONES DE DESCUENTO -->
+
+        <div class="cupon-section">
+
+            <h2>Generar Cupón de Descuento</h2>
+
+            <div class="cupon-form">
+
+                <div class="form-group">
+                    <label>Cliente destinatario (Email)</label>
+                    <input
+                            type="email"
+                            id="clienteCuponEmail"
+                            placeholder="cliente@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de descuento</label>
+                    <select id="tipoDescuento">
+                        <option value="">Seleccione...</option>
+                        <option value="PORCENTAJE">Porcentaje</option>
+                        <option value="MONTO_FIJO">Monto fijo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Valor del descuento</label>
+                    <input
+                            type="number"
+                            step="0.01"
+                            id="valorDescuento"
+                            placeholder="Ej: 15 o 2500">
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha desde</label>
+                    <input type="date" id="fechaDesde">
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha hasta</label>
+                    <input type="date" id="fechaHasta">
+                </div>
+
+                <button onclick="generarCupon()" class="btn-generar-cupon">
+                    Generar Cupón
+                </button>
+
+                <div id="resultadoCupon"></div>
+
+            </div>
+
+        </div>
+
     </div>
 </div>
 
+<script src="generarCupones.js"></script>
 <script src="auth.js"></script>
 <script src="navbar.js"></script>
 <script>
