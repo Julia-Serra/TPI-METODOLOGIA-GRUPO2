@@ -23,7 +23,9 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
            "FROM Pedido ped " +
            "JOIN ped.items i " +
            "JOIN i.producto p " +
-           "WHERE ped.estado = 'ENTREGADO' " +
+           "WHERE ped.estado IN (com.metodologia.bodyPaint.feature.models.EstadoPedido.LISTO, " +
+           "com.metodologia.bodyPaint.feature.models.EstadoPedido.RETIRADO_POR_CORREO, " +
+           "com.metodologia.bodyPaint.feature.models.EstadoPedido.ENTREGADO) " +
            "AND (:mes IS NULL OR MONTH(ped.fecha) = :mes) " +
            "AND (:anio IS NULL OR YEAR(ped.fecha) = :anio) " +
            "GROUP BY p.id, p.nombre, p.marca " +
