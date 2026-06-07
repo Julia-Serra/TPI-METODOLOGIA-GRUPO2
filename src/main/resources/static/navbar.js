@@ -25,6 +25,7 @@ function renderNavbar() {
       <a href="/producto.html"><button>Productos</button></a>
       <a href="/carrito.html"><button>Carrito</button></a>
       <a href="/pedidos.html"><button>Pedidos</button></a>
+      <a href="/historial.html"><button>Mis Pedidos</button></a>
       <a href="/domicilios.html"><button>Domicilios</button></a>
       <button onclick="logout()" style="background-color: #881c1c; color: white;">Logout</button>
     `;

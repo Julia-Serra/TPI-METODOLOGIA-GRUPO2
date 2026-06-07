@@ -29,4 +29,16 @@ public class PedidoGetController {
         List<Pedido> pedidos = pedidoGetService.listarPendientesDelCliente(email);
         return BaseResponse.ok(pedidos, "Pedidos pendientes del cliente");
     }
+    @GetMapping("/historial")
+    public BaseResponse<List<Pedido>> historialCliente(
+            @RequestParam String email) {
+
+        List<Pedido> pedidos =
+                pedidoGetService.historialCliente(email);
+
+        return BaseResponse.ok(
+                pedidos,
+                "Historial de pedidos"
+        );
+    }//US nueva-------
 }

@@ -32,5 +32,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
            "ORDER BY SUM(i.cantidad) DESC")
     List<ReporteProductoMasVendidoResponse> obtenerProductosMasVendidos(
             @Param("mes") Integer mes,
-            @Param("anio") Integer anio);
+            @Param("anio") Integer anio
+    );
+    List<Pedido> findByClienteOrderByFechaDesc(Cliente cliente); //US nueva------
 }

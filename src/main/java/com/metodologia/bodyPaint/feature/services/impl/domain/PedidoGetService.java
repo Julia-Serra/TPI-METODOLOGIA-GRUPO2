@@ -38,4 +38,15 @@ public class PedidoGetService {
                 .filter(p -> p.getItems() != null && !p.getItems().isEmpty())
                 .toList();
     }
+
+    public List<Pedido> historialCliente(String email) {
+
+        Cliente cliente = clienteRepository
+                .findByEmailIgnoreCase(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Cliente no encontrado"));
+
+        return pedidoRepository
+                .findByClienteOrderByFechaDesc(cliente);
+    }//US nueva-----
 }

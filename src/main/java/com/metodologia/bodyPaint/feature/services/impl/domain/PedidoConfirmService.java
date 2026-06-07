@@ -7,6 +7,7 @@ import com.metodologia.bodyPaint.feature.repositories.ClienteRepository;
 import com.metodologia.bodyPaint.feature.repositories.PedidoRepository;
 import com.metodologia.bodyPaint.feature.repositories.ProductoRepository;
 import com.metodologia.bodyPaint.feature.services.interfaces.domain.IPedidoConfirmService;
+import java.time.LocalDate;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -88,6 +89,7 @@ public class PedidoConfirmService implements IPedidoConfirmService {
                 .domicilioEnvio(request.getDomicilioEnvio())
                 .formaPago(request.getFormaPago())
                 .estado(EstadoPedido.PENDIENTE_PREPARACION)
+                .fecha(LocalDate.now())//US nueva---------
                 .build();
 
         for (ItemCarrito item : carrito.getItems()) {
