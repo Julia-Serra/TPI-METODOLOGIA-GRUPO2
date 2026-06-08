@@ -3,10 +3,207 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BodyPaint Studio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Estilos e Interfaz Avanzada para el Hero */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #1a1226; /* Fondo general ultra-oscuro */
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            /* Degradado de fondo que simula manchas de pintura difuminadas */
+            background: radial-gradient(circle at 85% 20%, rgba(188, 46, 126, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 15% 80%, rgba(35, 25, 50, 0.8) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #ffffff;
+            margin: 0 0 20px 0;
+            letter-spacing: -1px;
+        }
+
+        .hero-text h1 span {
+            color: #bc2e7e;
+            display: block;
+            font-style: italic;
+            font-weight: 400;
+            background: linear-gradient(45deg, #bc2e7e, #ff69b4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            color: #b3a7c4;
+            max-width: 540px;
+            margin: 0 0 40px 0;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .hero-buttons a {
+            text-decoration: none;
+        }
+
+        /* Botones estilizados con micro-interacciones */
+        .btn-primary, .btn-secondary {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #bc2e7e 0%, #a02267 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(188, 46, 126, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(188, 46, 126, 0.5);
+            background: linear-gradient(135deg, #ff69b4 0%, #bc2e7e 100%);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ffffff;
+            border: 2px solid rgba(188, 46, 126, 0.5);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            border-color: #ff69b4;
+            background: rgba(188, 46, 126, 0.1);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Contenedor de la Tarjeta Abstracta (Estilo Paleta de Maquillaje) */
+        .hero-card {
+            background: linear-gradient(135deg, #231932 0%, #170f22 100%);
+            border: 1px solid rgba(188, 46, 126, 0.2);
+            border-radius: 30px;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            transition: transform 0.5s ease;
+        }
+
+        .hero-card:hover {
+            transform: scale(1.02) rotate(1deg);
+        }
+
+        /* Círculos decorativos de pintura difuminada de fondo */
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            background: #ff69b4;
+            filter: blur(40px);
+            border-radius: 50%;
+            top: 20%;
+            left: 15%;
+            opacity: 0.4;
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            background: #20b2aa;
+            filter: blur(45px);
+            border-radius: 50%;
+            bottom: 15%;
+            right: 10%;
+            opacity: 0.3;
+        }
+
+        .hero-icon {
+            font-size: 7.5rem;
+            z-index: 2;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Animación sutil de flotación para la paleta */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Responsivo para netbooks y celulares */
+        @media (max-width: 968px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+            .hero-text h1 {
+                font-size: 3.2rem;
+            }
+            .hero-text p {
+                margin: 0 auto 35px auto;
+            }
+            .hero-buttons {
+                justify-content: center;
+            }
+            .hero-card {
+                max-width: 320px;
+                margin: 0 auto;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -62,6 +259,15 @@
 
 <script src="auth.js"></script>
 <script src="navbar.js"></script>
+
+<script>
+    // Configuración base de estilos para SweetAlerts global en la home
+    const swalConfig = {
+        confirmButtonColor: '#bc2e7e',
+        background: '#231932',
+        color: '#ffffff'
+    };
+</script>
 
 </body>
 </html>

@@ -1,14 +1,135 @@
-<!-- producto.html -->
-
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <title>Productos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos | BodyPaint Studio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Estilos Avanzados para la Interfaz de Catálogo y Filtros */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #1a1226;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .titulo {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #ffffff, #ff69b4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Contenedor del Panel de Filtros */
+        .filtros {
+            background: linear-gradient(135deg, #231932 0%, #170f22 100%);
+            border: 1px solid rgba(188, 46, 126, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        /* Envoltorio semántico para Label + Input */
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #b3a7c4;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .filtros input {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 12px 16px;
+            border: 1px solid rgba(188, 46, 126, 0.4);
+            border-radius: 8px;
+            background-color: #2a1f35;
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .filtros input:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 8px rgba(255, 105, 180, 0.4);
+            background-color: #31243f;
+        }
+
+        /* Botón de filtrado con micro-interacción */
+        .btn-filtrar {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 13px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #bc2e7e 0%, #a02267 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(188, 46, 126, 0.2);
+            width: 100%;
+            height: 48px;
+        }
+
+        .btn-filtrar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(188, 46, 126, 0.4);
+            background: linear-gradient(135deg, #ff69b4 0%, #bc2e7e 100%);
+        }
+
+        /* Grid de Productos */
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        /* Estilos adaptativos */
+        @media (max-width: 768px) {
+            .titulo {
+                font-size: 2.3rem;
+            }
+            .filtros {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -17,64 +138,64 @@
 
 <div class="container">
 
-    <h1 class="titulo">
-        Productos
-    </h1>
+    <h1 class="titulo">Nuestros Productos</h1>
 
     <div class="filtros">
 
-        <input
-                type="text"
-                id="filtroNombre"
-                placeholder="Buscar por nombre"
-        >
+        <div class="filter-group">
+            <label for="filtroNombre">Nombre</label>
+            <input type="text" id="filtroNombre" placeholder="Ej: Maquillaje Neón">
+        </div>
 
-        <input
-                type="text"
-                id="filtroMarca"
-                placeholder="Buscar por marca"
-        >
+        <div class="filter-group">
+            <label for="filtroMarca">Marca</label>
+            <input type="text" id="filtroMarca" placeholder="Ej: BodyPaint Pro">
+        </div>
 
-        <input
-                type="number"
-                id="precioMin"
-                placeholder="Precio mínimo"
-        >
+        <div class="filter-group">
+            <label for="precioMin">Precio Mínimo</label>
+            <input type="number" id="precioMin" placeholder="$ Mín">
+        </div>
 
-        <input
-                type="number"
-                id="precioMax"
-                placeholder="Precio máximo"
-        >
+        <div class="filter-group">
+            <label for="precioMax">Precio Máximo</label>
+            <input type="number" id="precioMax" placeholder="$ Máx">
+        </div>
 
-        <input
-                type="number"
-                id="stockMin"
-                placeholder="Stock mínimo"
-        >
+        <div class="filter-group">
+            <label for="stockMin">Stock Mínimo</label>
+            <input type="number" id="stockMin" placeholder="Cant. Mín">
+        </div>
 
-        <input
-                type="number"
-                id="stockMax"
-                placeholder="Stock máximo"
-        >
+        <div class="filter-group">
+            <label for="stockMax">Stock Máximo</label>
+            <input type="number" id="stockMax" placeholder="Cant. Máx">
+        </div>
 
-        <button onclick="filtrarProductos()">
-            Filtrar
-        </button>
+        <div class="filter-group">
+            <button class="btn-filtrar" onclick="filtrarProductos()">
+                Filtrar Catálogo
+            </button>
+        </div>
 
     </div>
 
-    <div
-            class="productos-grid"
-            id="productosGrid"
-    ></div>
+    <div class="productos-grid" id="productosGrid"></div>
 
 </div>
 
 <script src="auth.js"></script>
 <script src="navbar.js"></script>
 <script src="producto.js"></script>
+
+<script>
+    // Configuración centralizada de SweetAlerts para la lógica de producto.js
+    const swalConfig = {
+        confirmButtonColor: '#bc2e7e',
+        background: '#231932',
+        color: '#ffffff'
+    };
+</script>
 
 </body>
 </html>
