@@ -43,6 +43,33 @@ async function cargarPedidos() {
                 `;
             });
 
+            // --- AQUÍ EL CAMBIO GENERAL ---
+            // Si el usuario es "cliente" (es decir, detectamos su email), ocultamos el select y el botón de actualizar.
+            let accionesEstadoHtml = "";
+            
+            if (!email) { 
+                // Si NO hay email (Admin/Vendedor), agregamos los controles para cambiar de estado
+                accionesEstadoHtml = `
+                    <select id="estado-${pedido.id}">
+                        <option value="LISTO">
+                            LISTO
+                        </option>
+
+                        <option value="RETIRADO_POR_CORREO">
+                            RETIRADO POR CORREO
+                        </option>
+
+                        <option value="ENTREGADO">
+                            ENTREGADO
+                        </option>
+                    </select>
+
+                    <button onclick="actualizarEstado(${pedido.id})">
+                        Actualizar
+                    </button>
+                `;
+            }
+
             grid.innerHTML += `
 
                 <div class="producto-card">
@@ -81,23 +108,7 @@ async function cargarPedidos() {
                         ${itemsHtml}
                     </ul>
 
-                    <select id="estado-${pedido.id}">
-                        <option value="LISTO">
-                            LISTO
-                        </option>
-
-                        <option value="RETIRADO_POR_CORREO">
-                            RETIRADO POR CORREO
-                        </option>
-
-                        <option value="ENTREGADO">
-                            ENTREGADO
-                        </option>
-                    </select>
-
-                    <button onclick="actualizarEstado(${pedido.id})">
-                        Actualizar
-                    </button>
+                    ${accionesEstadoHtml}
 
                 </div>
             `;
