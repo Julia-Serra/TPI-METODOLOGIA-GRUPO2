@@ -14,7 +14,7 @@ function renderNavbar() {
   if (!session) {
     // Sin autenticación
     navLinksHTML += `
-      <a href="/index.html"><button>Productos</button></a>
+      <a href="/producto.html"><button>Productos</button></a>
       <a href="/login.html"><button>Login</button></a>
       <a href="/login.html?mode=register"><button>Registrarse</button></a>
     `;
