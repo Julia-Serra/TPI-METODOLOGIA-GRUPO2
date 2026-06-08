@@ -399,6 +399,37 @@ Como administrador quiero conocer los productos con mayor volumen de ventas.
 - Filtro por año.
 - Validación de filtros inválidos.
 
+---
+#### US16 - Reporte de Productos Más Vendidos
+
+Como vendedor quiero generar un reporte de productos más vendidos para conocer cuáles son los artículos con mayor demanda y apoyar la toma de decisiones comerciales.
+
+**Funcionalidades implementadas:**
+- Generación automática del ranking de productos más vendidos.
+- Visualización de cantidad de ventas por producto.
+- Ordenamiento descendente según volumen de ventas.
+- Consulta histórica de ventas.
+- Información útil para reposición de stock y planificación comercial.
+
+---
+### Historial de Pedidos
+
+#### US15 - Visualizar Historial de Pedidos
+
+Como cliente quiero visualizar mi historial de pedidos realizados para consultar compras anteriores y conocer el estado de cada una.
+
+**Funcionalidades implementadas:**
+- Visualización de todos los pedidos asociados al cliente.
+- Ordenamiento por fecha descendente.
+- Consulta de fecha del pedido.
+- Consulta de estado actual.
+- Consulta de forma de pago utilizada.
+- Consulta del total del pedido.
+- Visualización de los productos incluidos en cada pedido.
+- Restricción de acceso para usuarios no autenticados.
+
+---
+
 ##  Seguridad y Validaciones
 
 El sistema incorpora distintas validaciones de negocio:
@@ -413,10 +444,12 @@ El sistema incorpora distintas validaciones de negocio:
 
 ---
 
+
 ##  Equipo de Desarrollo
 
 | Integrante | Rol |
 |------------|------|
+| Meloni Gregorio| Product Owner|
 | Pagniez Tobias | Scrum Master |
 | Luna Nazareno | developer |
 | Lozano Valentino | developer |
