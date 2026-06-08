@@ -100,7 +100,10 @@ public class PedidoConfirmService implements IPedidoConfirmService {
                     .build();
             pedido.getItems().add(nuevoItem);
         }
-
-        return pedidoRepository.save(pedido);
+        Pedido pedidoGuardado = pedidoRepository.save(pedido);
+        // Vaciar carrito
+        carrito.getItems().clear();
+        carritoRepository.save(carrito);
+        return pedidoGuardado;
     }
 }
