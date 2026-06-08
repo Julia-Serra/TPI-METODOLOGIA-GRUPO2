@@ -45,13 +45,16 @@ async function cargarProductos(
                     ? "producto-card producto-alerta-stock"
                     : "producto-card";
 
+            // Evaluamos si 'p.imagen' tiene texto. Si está vacío o null, ponemos directamente el placeholder válido.
+            const srcImagen = p.imagen ? `${API}/uploads/${p.imagen}` : 'https://placehold.co/300x250';
+
             card.innerHTML = `
 
                 <div class="producto-img-container">
 
                     <img
-                        src="${API}/uploads/${p.imagen}"
-                        onerror="this.src='https://via.placeholder.com/300x250'"
+                        src="${srcImagen}"
+                        onerror="this.src='https://placehold.co/300x250'"
                     >
 
                 </div>

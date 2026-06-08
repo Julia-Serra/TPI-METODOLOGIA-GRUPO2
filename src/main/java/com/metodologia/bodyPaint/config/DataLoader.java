@@ -76,6 +76,7 @@ public class DataLoader implements CommandLineRunner {
                     .build()
             );
 
+            
             Producto p1 = productoRepository.save(
                 Producto.builder()
                     .nombre("Pintura Facial")
@@ -84,9 +85,11 @@ public class DataLoader implements CommandLineRunner {
                     .stock(50)
                     .stockMinimo(10)
                     .activo(true)
+                    .imagen("pintura-facial.jpg") 
                     .build()
             );
 
+           
             Producto p2 = productoRepository.save(
                 Producto.builder()
                     .nombre("Pintura Corporal")
@@ -95,9 +98,11 @@ public class DataLoader implements CommandLineRunner {
                     .stock(30)
                     .stockMinimo(5)
                     .activo(true)
+                    .imagen("pintura-corporal.jpg") 
                     .build()
             );
 
+            
             Producto p3 = productoRepository.save(
                 Producto.builder()
                     .nombre("Set de Brochas")
@@ -106,6 +111,7 @@ public class DataLoader implements CommandLineRunner {
                     .stock(25)
                     .stockMinimo(8)
                     .activo(true)
+                    .imagen("set-brochas.jpg") 
                     .build()
             );
 
