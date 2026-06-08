@@ -43,6 +43,29 @@ async function cargarPedidos() {
                 `;
             });
 
+            let accionesEstadoHtml = "";
+            if (!email) { 
+                accionesEstadoHtml = `
+                    <select id="estado-${pedido.id}">
+                        <option value="LISTO">
+                            LISTO
+                        </option>
+
+                        <option value="RETIRADO_POR_CORREO">
+                            RETIRADO POR CORREO
+                        </option>
+
+                        <option value="ENTREGADO">
+                            ENTREGADO
+                        </option>
+                    </select>
+
+                    <button onclick="actualizarEstado(${pedido.id})">
+                        Actualizar
+                    </button>
+                `;
+            }
+
             grid.innerHTML += `
 
                 <div class="producto-card">
@@ -81,23 +104,7 @@ async function cargarPedidos() {
                         ${itemsHtml}
                     </ul>
 
-                    <select id="estado-${pedido.id}">
-                        <option value="LISTO">
-                            LISTO
-                        </option>
-
-                        <option value="RETIRADO_POR_CORREO">
-                            RETIRADO POR CORREO
-                        </option>
-
-                        <option value="ENTREGADO">
-                            ENTREGADO
-                        </option>
-                    </select>
-
-                    <button onclick="actualizarEstado(${pedido.id})">
-                        Actualizar
-                    </button>
+                    ${accionesEstadoHtml}
 
                 </div>
             `;
@@ -276,5 +283,3 @@ async function cancelarPedido(id) {
 }
 
 cargarPedidos();
-
-setInterval(cargarPedidos, 5000);
