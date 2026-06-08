@@ -43,12 +43,8 @@ async function cargarPedidos() {
                 `;
             });
 
-            // --- AQUÍ EL CAMBIO GENERAL ---
-            // Si el usuario es "cliente" (es decir, detectamos su email), ocultamos el select y el botón de actualizar.
             let accionesEstadoHtml = "";
-            
             if (!email) { 
-                // Si NO hay email (Admin/Vendedor), agregamos los controles para cambiar de estado
                 accionesEstadoHtml = `
                     <select id="estado-${pedido.id}">
                         <option value="LISTO">
@@ -287,5 +283,3 @@ async function cancelarPedido(id) {
 }
 
 cargarPedidos();
-
-setInterval(cargarPedidos, 5000);
