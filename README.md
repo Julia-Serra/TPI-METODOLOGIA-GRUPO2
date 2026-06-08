@@ -494,7 +494,62 @@ POST /pedidos/confirmar
 }
 ```
 ---
+ Metodología de Trabajo
 
+El proyecto fue desarrollado siguiendo prácticas ágiles inspiradas en Scrum. La planificación y seguimiento de funcionalidades se realizó mediante Historias de Usuario, criterios de aceptación, estimación por Story Points y definición de criterios de inicio y finalización.
+
+Definition of Ready (DoR)
+
+Una Historia de Usuario se consideró lista para comenzar cuando cumplía las siguientes condiciones:
+
+Estaba redactada en formato Como / Quiero / Para.
+Poseía criterios de aceptación claros y completos.
+Era comprendida por todos los integrantes del equipo.
+Estaba estimada en Story Points.
+No tenía dependencias bloqueantes.
+Poseía un alcance bien definido.
+Contaba con información funcional suficiente.
+Tenía definidos los datos de entrada y salida necesarios.
+Definition of Done (DoD)
+
+Una Historia de Usuario se consideró terminada cuando:
+
+El código estaba implementado.
+Se cumplían todos los criterios de aceptación.
+Se realizaron pruebas funcionales.
+No presentaba errores críticos.
+El código se encontraba versionado en Git.
+Se realizó revisión de código cuando correspondía.
+La funcionalidad estaba integrada sin afectar otras características existentes.
+Fue validada por el equipo.
+La documentación fue actualizada cuando resultó necesario.
+Planning Poker y Estimación
+
+Las historias de usuario fueron estimadas utilizando la técnica Planning Poker, considerando:
+
+### Tabla de Estimaciones (Planning Poker)
+
+| Historia de Usuario | Complejidad | Esfuerzo | Incertidumbre | Story Points |
+|---------------------|------------|-----------|---------------|-------------:|
+| US1 - Registrar cliente | Media | Media | Baja | 5 |
+| US2 - Crear producto | Media | Baja | Baja | 3 |
+| US3 - Visualizar productos | Baja | Baja | Nula | 1 |
+| US4 - Armar carrito de compras | Media | Media | Baja | 5 |
+| US5 - Confirmar pedido | Media | Media | Baja | 5 |
+| US6 - Visualizar pedidos pendientes | Baja | Baja | Nula | 2 |
+| US7 - Búsqueda y filtrado de productos | Media | Media | Baja | 5 |
+| US8 - Validaciones de registro | Baja | Baja | Nula | 2 |
+| US9 - Configurar stock mínimo | Media | Media | Baja | 3 |
+| US10 - Dar de baja producto | Media | Media | Baja | 3 |
+| US11 - Cancelar entrega de pedido | Media | Media | Baja | 5 |
+| US12 - Registrar cumplimiento de pedido | Media | Media | Baja | 5 |
+| US13 - Importar imagen de producto | Media | Media | Baja | 3 |
+| US14 - Registrar domicilio de envío | Media | Media | Baja | 5 |
+| US15 - Visualizar historial de pedidos | Media | Media | Baja | 5 |
+| US16 - Generar cupón de descuento | Alta | Alta | Media | 5 |
+| US17 - Aplicar cupón de descuento | Media | Media | Baja | 5 |
+| US18 - Reporte de productos más vendidos | Media | Media | Baja | 3 |
+| US19 - Reporte de productos cerca del stock mínimo | Media | Media | Baja | 3 |
 
 
 ---
